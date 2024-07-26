@@ -1,0 +1,2 @@
+volume_BGM:80
+volume_Sound:100
