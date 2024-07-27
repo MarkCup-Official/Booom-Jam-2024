@@ -27,9 +27,9 @@ public class MoveController : MonoBehaviour
     }
     private void Update()
     {
-        CheckIsGround();
+        isGround = CheckIsGround();
         JumpLogic();
-        
+        BetterGravity();
     }
     private void FixedUpdate()
     {
@@ -38,8 +38,8 @@ public class MoveController : MonoBehaviour
     }
     public void HorizontalMove(float value)
     {
-        rb.velocity = new Vector2(value * moveSpeed,rb.velocity.y);
-        
+        if (value == 0f) return;
+            rb.velocity = new Vector2(value * moveSpeed, rb.velocity.y);
     }
     /// <summary>
     /// 检测角色是否在地面上
@@ -62,11 +62,22 @@ public class MoveController : MonoBehaviour
    
     public void JumpLogic()
     {
-      
-        if (InputMgr.GetSpace() && CheckIsGround()&& jumpTimer + jumpCD <= Time.time)
+       
+        if (InputMgr.GetSpace() && isGround && jumpTimer + jumpCD <= Time.time)
         {
             rb.velocity = new Vector2(rb.velocity.x, JumpForce);
             jumpTimer = Time.time;
+        }
+    }
+    public void BetterGravity()
+    {
+        if (InputMgr.GetSpace() && rb.velocity.y > 0)
+        {
+            rb.gravityScale = 1f;
+        }
+        else
+        {
+            rb.gravityScale = 2;
         }
     }
 }
