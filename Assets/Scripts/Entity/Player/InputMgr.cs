@@ -20,6 +20,11 @@ public static class InputMgr
         if (!isActive) return false;
         return Input.GetKey(KeyCode.Space);
     }
+    public static bool GetSpaceDown()
+    {
+        if (!isActive) return false;
+        return Input.GetKeyDown(KeyCode.Space);
+    }
     public static void Enable()
     {
         isActive = true;
