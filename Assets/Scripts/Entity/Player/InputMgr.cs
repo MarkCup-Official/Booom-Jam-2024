@@ -25,6 +25,16 @@ public static class InputMgr
         if (!isActive) return false;
         return Input.GetKeyDown(KeyCode.Space);
     }
+    public static bool IsCatchButtonDown()
+    {
+        if (!isActive) return false;
+        return Input.GetKeyDown(KeyCode.E);
+    }
+    public static bool IsCatching()
+    {
+        if (!isActive) return false;
+        return Input.GetKey(KeyCode.E);
+    }
     public static void Enable()
     {
         isActive = true;

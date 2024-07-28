@@ -4,20 +4,26 @@ using UnityEngine;
 
 public class MoveController : MonoBehaviour
 {
-    public float MoveSpeed = 10;
-    public float JumpForce = 5;
+    public float MoveSpeed;
+    public float JumpForce;
     private float jumpTimer;
     private float jumpCD = 0.1f;
     private Rigidbody2D rb;
+    private Collider2D _collider;
     private bool isGround;
+    public bool IsGround { get { return isGround; } }
     private float coyoteTimeTimer;//土狼时间
+    private PhysicsMaterial2D normalPhysicMat2D;
+    private PhysicsMaterial2D smoothPhysicMat2D;
 
     public Transform[] rayCheckPoints;
 
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
-
+        _collider = GetComponent<CapsuleCollider2D>();
+        normalPhysicMat2D = Resources.Load<PhysicsMaterial2D>("Config/NormalMat");
+        smoothPhysicMat2D = Resources.Load<PhysicsMaterial2D>("Config/SmoothMat");
     }
     private void Start()
     {
@@ -26,7 +32,8 @@ public class MoveController : MonoBehaviour
     private void Update()
     {
         isGround = CheckIsGround();
-
+        CoyoteTimer();
+        ChangePhysicMat();
         BetterGravity();
     }
 
@@ -36,6 +43,21 @@ public class MoveController : MonoBehaviour
         rb.velocity = new Vector2(value * MoveSpeed, rb.velocity.y);
     }
     /// <summary>
+    /// 在空中切换成光滑物理材质，防止卡墙
+    /// </summary>
+    private void ChangePhysicMat()
+    {
+        if (isGround) _collider.sharedMaterial = normalPhysicMat2D;
+        else _collider.sharedMaterial = smoothPhysicMat2D;
+    }
+    private void CoyoteTimer()
+    {
+        if(isGround)
+            coyoteTimeTimer = 0.1f;
+        else
+            coyoteTimeTimer -= Time.deltaTime;
+    }
+    /// <summary>
     /// 检测角色是否在地面上
     /// </summary>
     /// <returns></returns>
@@ -43,13 +65,13 @@ public class MoveController : MonoBehaviour
     {
         for (int i = 0; i < rayCheckPoints.Length; i++)
         {
-            if (Physics2D.Raycast(rayCheckPoints[i].position, Vector2.down, 0.1f, ~(1 << 3)))
+            if (Physics2D.Raycast(rayCheckPoints[i].position, Vector2.down, 0.1f, (1 << 7)))
             {
-                coyoteTimeTimer = 0.1f;
+               
                 return true;
             }
         }
-        coyoteTimeTimer -= Time.deltaTime;
+        
         return false;
     }
     /// <summary>
@@ -66,6 +88,9 @@ public class MoveController : MonoBehaviour
             jumpTimer = Time.time;
         }
     }
+    /// <summary>
+    /// 当玩家长按空格，跳跃高度会越高
+    /// </summary>
     public void BetterGravity()
     {
         if (InputMgr.GetSpace() && rb.velocity.y > 0)
@@ -76,5 +101,17 @@ public class MoveController : MonoBehaviour
         {
             rb.gravityScale = 2;
         }
+    }
+    public float GetVerticalSpeed()
+    {
+        return rb.velocity.y;
+    }
+    public void SetSpeed(float value)
+    {
+        this.MoveSpeed = value;
+    }
+    public void SetJumpForce(float value)
+    {
+        jumpTimer = value;
     }
 }

@@ -100,7 +100,10 @@ namespace GameFramework.FSM
             curState.Reason();
             curState.OnUpdate();
         }
-
+        public void FixedUpdate()
+        {
+            curState.OnFixedUpdate();
+        }
     }
 }
 

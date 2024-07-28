@@ -32,8 +32,15 @@ namespace GameFramework.FSM
             actions.Add(func);
         }
 
-        public abstract void OnEnter();
+        public virtual void OnEnter()
+        {
+
+        }
         public virtual void OnUpdate()
+        {
+
+        }
+        public virtual void OnFixedUpdate()
         {
 
         }
