@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
-namespace MyClass.FSM
+namespace GameFramework.FSM
 {
     public abstract class BaseState
     {
@@ -32,8 +32,15 @@ namespace MyClass.FSM
             actions.Add(func);
         }
 
-        public abstract void OnEnter();
+        public virtual void OnEnter()
+        {
+
+        }
         public virtual void OnUpdate()
+        {
+
+        }
+        public virtual void OnFixedUpdate()
         {
 
         }

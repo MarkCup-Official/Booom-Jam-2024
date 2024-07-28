@@ -1,10 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using MyClass.FSM;
+using GameFramework.FSM;
 using System.Reflection;
 using System;
-namespace MyClass.FSM
+namespace GameFramework.FSM
 {
     public class FSM
     {
@@ -100,7 +100,10 @@ namespace MyClass.FSM
             curState.Reason();
             curState.OnUpdate();
         }
-
+        public void FixedUpdate()
+        {
+            curState.OnFixedUpdate();
+        }
     }
 }
 
