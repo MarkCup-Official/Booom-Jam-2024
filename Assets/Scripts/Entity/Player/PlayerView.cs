@@ -22,10 +22,12 @@ public class PlayerView : MonoBehaviour
         FlipTimer = Time.time;
         if (dir > 0f)
         {
+            //viewObject.transform.localScale = new Vector3(1, 1, 1);
             viewObject.transform.DOScaleX(1, FlipTime);
         }
          if (dir < 0f)
         {
+            //viewObject.transform.localScale = new Vector3(-1, 1, 1);
             viewObject.transform.DOScaleX(-1, FlipTime);
         }
    }

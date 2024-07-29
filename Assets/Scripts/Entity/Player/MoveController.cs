@@ -21,7 +21,7 @@ public class MoveController : MonoBehaviour
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
-        _collider = GetComponent<CapsuleCollider2D>();
+        _collider = GetComponent<Collider2D>();
         normalPhysicMat2D = Resources.Load<PhysicsMaterial2D>("Config/NormalMat");
         smoothPhysicMat2D = Resources.Load<PhysicsMaterial2D>("Config/SmoothMat");
     }
@@ -105,6 +105,10 @@ public class MoveController : MonoBehaviour
     public float GetVerticalSpeed()
     {
         return rb.velocity.y;
+    }
+    public Vector2 GetSpeed()
+    {
+        return rb.velocity;
     }
     public void SetSpeed(float value)
     {
