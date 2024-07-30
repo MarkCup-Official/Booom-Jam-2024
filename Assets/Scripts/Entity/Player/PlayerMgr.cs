@@ -11,17 +11,25 @@ public class PlayerMgr : MonoBehaviour
     public CameraAction targetCamera;
     
     
-    
 
     private void Awake()
     {
         moveController = GetComponent<MoveController>();
+        
         playerView = GetComponent<PlayerView>();
+        playerView.Init(this);
+        targetCamera.Init(moveController);
         targetCamera.SetPlayer(transform);
+
+
+
+
+
         fsm = new FSM();
         fsm.SetValue("mgr", this);
-        fsm.AddState<State_IsGround>(0);
+        fsm.AddState<State_IDLE>(0);
         fsm.AddState<State_PushBox>(1);
+        fsm.AddState<State_CatchBox>(2);
         fsm.InitDefaultState(0);
     }
     private void Update()
@@ -46,6 +54,7 @@ namespace GameFramework.FSM.Player
         public override void OnUpdate()
         {
             mgr.targetCamera.FollowPlayer();
+            
         }
         public override void OnFixedUpdate()
         {
@@ -54,15 +63,14 @@ namespace GameFramework.FSM.Player
 
         public bool CheckBox()
         {
-            Debug.DrawRay(mgr.transform.position, Vector2.down);
-            RaycastHit2D hit = Physics2D.Raycast(mgr.transform.position, Vector2.down, 1, 1 << 6);
-            return hit && InputMgr.IsCatching();
+            RaycastHit2D hit = Physics2D.Raycast(mgr.transform.position - new Vector3(0,0.6f,0), Vector2.up, 1.2f, 1 << 6);
+            return hit;
         }
     }
 
-    public class State_IsGround : PlayerState
+    public class State_IDLE : PlayerState
     {
-        public State_IsGround(FSM owner) : base(owner)
+        public State_IDLE(FSM owner) : base(owner)
         {
             
         }
@@ -75,9 +83,11 @@ namespace GameFramework.FSM.Player
         public override void OnUpdate()
         {
             base.OnUpdate();
+           
             mgr.moveController.JumpLogic(InputMgr.GetSpaceDown());
             mgr.playerView.Flip(InputMgr.GetHorizontal());
-            if (CheckBox()) owner.SwitchState(1);
+            if (CheckBox() && InputMgr.IsCatching()&&mgr.moveController.IsGround) owner.SwitchState(1);
+            if (CheckBox() && InputMgr.IsRaiseTheBox() && mgr.moveController.IsGround) owner.SwitchState(2);
         }
         
 
@@ -94,16 +104,47 @@ namespace GameFramework.FSM.Player
             mgr.moveController.SetJumpForce(0f);
             mgr.moveController.SetSpeed(1.5f);
 
-            target = Physics2D.Raycast(mgr.transform.position, Vector2.down, 1, 1 << 6).collider.GetComponent<ICacthable>();
-            target.SetOwner(mgr.transform);
+            RaycastHit2D hit = Physics2D.Raycast(mgr.transform.position, Vector2.down, 1, 1 << 6);
+            target = hit.collider.GetComponent<ICacthable>();
+            
+            target.Set(mgr.transform,CatchType.Push);
             target.OnEnterCatch();
         }
         public override void OnUpdate()
         {
             base.OnUpdate();
-            if (!CheckBox()) owner.SwitchState(0);
+            if (!(CheckBox() && InputMgr.IsCatching())) owner.SwitchState(0);
 
             target.OnUpdate();
+        }
+        public override void OnExit()
+        {
+            target.OnExitCatch();
+        }
+    }
+    public class State_CatchBox : PlayerState
+    {
+        private ICacthable target;
+        public State_CatchBox(FSM owner) : base(owner)
+        {
+        }
+
+        public override void OnEnter()
+        {
+            mgr.moveController.SetJumpForce(0f);
+            mgr.moveController.SetSpeed(1.5f);
+
+            RaycastHit2D hit = Physics2D.Raycast(mgr.transform.position, Vector2.down, 1, 1 << 6);
+            if (hit == false) return;
+            target = hit.collider.GetComponent<ICacthable>();
+            target.Set(mgr.transform,CatchType.Raise);
+            target.OnEnterCatch();
+        }
+        public override void OnUpdate()
+        {
+            base.OnUpdate();
+            target.OnUpdate();
+            if (!(CheckBox() && InputMgr.IsRaiseTheBox())) owner.SwitchState(0);
         }
         public override void OnExit()
         {

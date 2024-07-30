@@ -17,11 +17,12 @@ public class MoveController : MonoBehaviour
     private PhysicsMaterial2D smoothPhysicMat2D;
 
     public Transform[] rayCheckPoints;
+    public System.Action onLandAction;
 
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
-        _collider = GetComponent<CapsuleCollider2D>();
+        _collider = GetComponent<Collider2D>();
         normalPhysicMat2D = Resources.Load<PhysicsMaterial2D>("Config/NormalMat");
         smoothPhysicMat2D = Resources.Load<PhysicsMaterial2D>("Config/SmoothMat");
     }
@@ -35,12 +36,19 @@ public class MoveController : MonoBehaviour
         CoyoteTimer();
         ChangePhysicMat();
         BetterGravity();
+       
     }
-
+    public void OnLand()
+    {
+        onLandAction?.Invoke();
+    }
     public void HorizontalMove(float value)
     {
+       
         if (value == 0f) return;
         rb.velocity = new Vector2(value * MoveSpeed, rb.velocity.y);
+
+
     }
     /// <summary>
     /// 在空中切换成光滑物理材质，防止卡墙
@@ -67,7 +75,9 @@ public class MoveController : MonoBehaviour
         {
             if (Physics2D.Raycast(rayCheckPoints[i].position, Vector2.down, 0.1f, (1 << 7)))
             {
-               
+                if (!isGround)
+                    OnLand();
+
                 return true;
             }
         }
@@ -105,6 +115,10 @@ public class MoveController : MonoBehaviour
     public float GetVerticalSpeed()
     {
         return rb.velocity.y;
+    }
+    public Vector2 GetSpeed()
+    {
+        return rb.velocity;
     }
     public void SetSpeed(float value)
     {
