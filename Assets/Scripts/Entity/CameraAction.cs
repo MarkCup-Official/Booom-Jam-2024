@@ -11,12 +11,13 @@ public class CameraAction : MonoBehaviour
     public float DefaultCameraSize = 5;
     public float MaxCameraSizeOffset = 1;
     public float CameraOffsetStrength = 1;
-    
+    public GameObject BackGround;
     public void Init(MoveController moveController)
     {
         controller = moveController;
         _camera = GetComponent<Camera>();
     }
+    
     public void SetPlayer(Transform target)
     {
         playerTransform = target;
@@ -29,6 +30,9 @@ public class CameraAction : MonoBehaviour
     }
     private void Update()
     {
+        BackGround.transform.position = new Vector3(transform.position.x, transform.position.y, 10);
+
+
         if (controller == null) return;
 
         float speed = controller.GetSpeed().magnitude;
