@@ -8,6 +8,10 @@ public class PlayerView : MonoBehaviour
     private float FlipTimer;
     private PlayerMgr mgr;
     public GameObject landParticlePrefab;
+    public Transform SpringCenter;
+    private int targetDir = 1;
+    public float OriginHeight = 0.8f;
+    public float SpringAddHeight = 0.4f;
     public void Init(PlayerMgr mgr)
     {
         this.mgr = mgr;
@@ -21,6 +25,12 @@ public class PlayerView : MonoBehaviour
     {
         FlipTimer = Time.time;
     }
+    private void Update()
+    {
+        float deltaY = SpringCenter.position.y - transform.position.y;
+        float height = OriginHeight + SpringAddHeight * deltaY;
+        viewObject.transform.localScale = new Vector3(targetDir * 1/height, height, 1);
+    }
     public void Flip(float dir)
     { 
         
@@ -33,13 +43,11 @@ public class PlayerView : MonoBehaviour
         FlipTimer = Time.time;
         if (dir > 0f)
         {
-            //viewObject.transform.localScale = new Vector3(1, 1, 1);
-            viewObject.transform.DOScaleX(1, FlipTime);
+            targetDir = 1;
         }
          if (dir < 0f)
         {
-            //viewObject.transform.localScale = new Vector3(-1, 1, 1);
-            viewObject.transform.DOScaleX(-1, FlipTime);
+            targetDir = -1;
         }
    }
     
