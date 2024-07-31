@@ -9,6 +9,7 @@ public class MoveController : MonoBehaviour
     private float jumpTimer;
     private float jumpCD = 0.1f;
     private Rigidbody2D rb;
+    public Rigidbody2D springRb;
     private Collider2D _collider;
     private bool isGround;
     public bool IsGround { get { return isGround; } }
@@ -95,6 +96,7 @@ public class MoveController : MonoBehaviour
         {
             coyoteTimeTimer = 0f;
             rb.velocity = new Vector2(rb.velocity.x, JumpForce);
+            springRb.velocity = new Vector2(springRb.velocity.x, 2 * JumpForce);
             jumpTimer = Time.time;
         }
     }
