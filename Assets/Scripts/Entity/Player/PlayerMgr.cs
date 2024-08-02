@@ -11,14 +11,20 @@ public class PlayerMgr : MonoBehaviour
     public CameraAction targetCamera;
     
     
-    
 
     private void Awake()
     {
         moveController = GetComponent<MoveController>();
+        
         playerView = GetComponent<PlayerView>();
+        playerView.Init(this);
         targetCamera.Init(moveController);
         targetCamera.SetPlayer(transform);
+
+
+
+
+
         fsm = new FSM();
         fsm.SetValue("mgr", this);
         fsm.AddState<State_IDLE>(0);
@@ -48,6 +54,7 @@ namespace GameFramework.FSM.Player
         public override void OnUpdate()
         {
             mgr.targetCamera.FollowPlayer();
+            
         }
         public override void OnFixedUpdate()
         {
@@ -76,6 +83,7 @@ namespace GameFramework.FSM.Player
         public override void OnUpdate()
         {
             base.OnUpdate();
+           
             mgr.moveController.JumpLogic(InputMgr.GetSpaceDown());
             mgr.playerView.Flip(InputMgr.GetHorizontal());
             if (CheckBox() && InputMgr.IsCatching()&&mgr.moveController.IsGround) owner.SwitchState(1);

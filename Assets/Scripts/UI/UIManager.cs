@@ -12,6 +12,11 @@ public class UIManager : BaseMonoManager<UIManager>
 {
     protected override void Awake()
     {
+        if (UIManager.Instance != null)
+        {
+            Destroy(gameObject);
+            return;
+        }
         base.Awake();
         DontDestroyOnLoad(gameObject);
     }
