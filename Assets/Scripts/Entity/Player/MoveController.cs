@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class MoveController : MonoBehaviour
 {
-    public float MoveSpeed;
-    public float JumpForce;
+    private float MoveSpeed = 3.5f;
+    private float JumpForce = 10f;
     private float jumpTimer;
     private float jumpCD = 0.1f;
     private Rigidbody2D rb;
@@ -107,11 +107,11 @@ public class MoveController : MonoBehaviour
     {
         if (InputMgr.GetSpace() && rb.velocity.y > 0)
         {
-            rb.gravityScale = 1f;
+            rb.gravityScale = 1.5f;
         }
         else
         {
-            rb.gravityScale = 2;
+            rb.gravityScale = 2.5f;
         }
     }
     public float GetVerticalSpeed()
@@ -128,6 +128,6 @@ public class MoveController : MonoBehaviour
     }
     public void SetJumpForce(float value)
     {
-        jumpTimer = value;
+        JumpForce = value;
     }
 }

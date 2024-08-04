@@ -10630,8 +10630,8 @@ MonoBehaviour:
   m_LightType: 4
   m_BlendStyleIndex: 0
   m_FalloffIntensity: 0.5
-  m_Color: {r: 0.98720616, g: 1, b: 0.7452829, a: 1}
-  m_Intensity: 1
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Intensity: 1.28
   m_LightVolumeIntensity: 1
   m_LightVolumeIntensityEnabled: 0
   m_ApplyToSortingLayers: 00000000
@@ -15517,10 +15517,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 1120373735563615928, guid: 024a690f963a263469c16d43a5a6a08f, type: 3}
-      propertyPath: m_Color.a
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 1250311466676683700, guid: 024a690f963a263469c16d43a5a6a08f, type: 3}
       propertyPath: m_LocalPosition.x
       value: -2.333
@@ -15569,29 +15565,9 @@ PrefabInstance:
       propertyPath: m_Name
       value: Player
       objectReference: {fileID: 0}
-    - target: {fileID: 5010660026262544039, guid: 024a690f963a263469c16d43a5a6a08f, type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7405468700765501496, guid: 024a690f963a263469c16d43a5a6a08f, type: 3}
-      propertyPath: m_Color.a
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7405468700765501496, guid: 024a690f963a263469c16d43a5a6a08f, type: 3}
-      propertyPath: m_Color.b
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 7405468700765501496, guid: 024a690f963a263469c16d43a5a6a08f, type: 3}
-      propertyPath: m_Color.g
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 7471317772023164948, guid: 024a690f963a263469c16d43a5a6a08f, type: 3}
-      propertyPath: m_SortingOrder
-      value: 3
-      objectReference: {fileID: 0}
-    - target: {fileID: 7679808208230571903, guid: 024a690f963a263469c16d43a5a6a08f, type: 3}
-      propertyPath: m_Color.a
-      value: 0
+    - target: {fileID: 7840827444480745092, guid: 024a690f963a263469c16d43a5a6a08f, type: 3}
+      propertyPath: JumpForce
+      value: 8.1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

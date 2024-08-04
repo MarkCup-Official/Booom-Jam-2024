@@ -7,8 +7,6 @@ using DG.Tweening;
 public class Box : MonoBehaviour, ICacthable
 {
     private Transform owner;
-    private CatchType type;
-    private Vector3 offset;
     private Rigidbody2D rb;
     public float ThrowForce = 3;
     private void Awake()
@@ -18,19 +16,18 @@ public class Box : MonoBehaviour, ICacthable
     }
     public void OnEnterCatch()
     {
-        rb.isKinematic = true;
-        offset = transform.position - owner.position;
-        if (type == CatchType.Raise)
-        {
-            offset += (Vector3)Vector2.up;
-        }
+       // rb.isKinematic = true;
+        gameObject.SetActive(false);
+        
+        
+        
     }
 
     public void OnExitCatch()
     {
-        
-        rb.isKinematic = false;
-        if(type == CatchType.Raise)
+        gameObject.SetActive(true);
+       // rb.isKinematic = false;
+        transform.position = owner.transform.position;
         rb.velocity = new Vector2(InputMgr.GetHorizontal(), 1) * ThrowForce;
 
         //Normalized();
@@ -47,18 +44,17 @@ public class Box : MonoBehaviour, ICacthable
     
     public void OnUpdate()
     {
-        transform.position = owner.transform.position + offset;
+       
     }
 
-    public void Set(Transform owner, CatchType type)
+    public void Set(Transform owner)
     {
-        this.type = type;
         this.owner = owner;
     }
 }
 public interface ICacthable
 {
-    public void Set(Transform owner,CatchType type);
+    public void Set(Transform owner);
     /// <summary>
     /// 刚抓起来时执行
     /// </summary>
@@ -72,9 +68,4 @@ public interface ICacthable
     /// </summary>
     public void OnExitCatch();
 
-}
-public enum CatchType
-{
-    Push,
-    Raise,
 }

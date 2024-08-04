@@ -30,16 +30,6 @@ public static class InputMgr
         if (!isActive) return false;
         return Input.GetKeyDown(KeyCode.E);
     }
-    public static bool IsCatching()
-    {
-        if (!isActive) return false;
-        return Input.GetKey(KeyCode.E);
-    }
-    public static bool IsRaiseTheBox()
-    {
-        if (!isActive) return false;
-        return Input.GetKey(KeyCode.F);
-    }
     public static void Enable()
     {
         isActive = true;

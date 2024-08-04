@@ -28,8 +28,7 @@ public class PlayerMgr : MonoBehaviour
         fsm = new FSM();
         fsm.SetValue("mgr", this);
         fsm.AddState<State_IDLE>(0);
-        fsm.AddState<State_PushBox>(1);
-        fsm.AddState<State_CatchBox>(2);
+        fsm.AddState<State_CatchBox>(1);
         fsm.InitDefaultState(0);
     }
     private void Update()
@@ -77,7 +76,8 @@ namespace GameFramework.FSM.Player
 
         public override void OnEnter()
         {
-            mgr.moveController.SetJumpForce(6.5f);
+            mgr.playerView.ChangeSprite(0);
+            mgr.moveController.SetJumpForce(10f);
             mgr.moveController.SetSpeed(3.5f);
         }
         public override void OnUpdate()
@@ -86,42 +86,12 @@ namespace GameFramework.FSM.Player
            
             mgr.moveController.JumpLogic(InputMgr.GetSpaceDown());
             mgr.playerView.Flip(InputMgr.GetHorizontal());
-            if (CheckBox() && InputMgr.IsCatching()&&mgr.moveController.IsGround) owner.SwitchState(1);
-            if (CheckBox() && InputMgr.IsRaiseTheBox() && mgr.moveController.IsGround) owner.SwitchState(2);
+            if (CheckBox() && InputMgr.IsCatchButtonDown() && mgr.moveController.IsGround) owner.SwitchState(1);
         }
         
 
     }
-    public class State_PushBox : PlayerState
-    {
-        private ICacthable target;
-        public State_PushBox(FSM owner) : base(owner)
-        {
-        }
 
-        public override void OnEnter()
-        {
-            mgr.moveController.SetJumpForce(0f);
-            mgr.moveController.SetSpeed(1.5f);
-
-            RaycastHit2D hit = Physics2D.Raycast(mgr.transform.position, Vector2.down, 1, 1 << 6);
-            target = hit.collider.GetComponent<ICacthable>();
-            
-            target.Set(mgr.transform,CatchType.Push);
-            target.OnEnterCatch();
-        }
-        public override void OnUpdate()
-        {
-            base.OnUpdate();
-            if (!(CheckBox() && InputMgr.IsCatching())) owner.SwitchState(0);
-
-            target.OnUpdate();
-        }
-        public override void OnExit()
-        {
-            target.OnExitCatch();
-        }
-    }
     public class State_CatchBox : PlayerState
     {
         private ICacthable target;
@@ -131,20 +101,23 @@ namespace GameFramework.FSM.Player
 
         public override void OnEnter()
         {
-            mgr.moveController.SetJumpForce(0f);
-            mgr.moveController.SetSpeed(1.5f);
+            mgr.moveController.SetJumpForce(8f);
+            mgr.moveController.SetSpeed(2.5f);
+            mgr.playerView.ChangeSprite(1);
 
             RaycastHit2D hit = Physics2D.Raycast(mgr.transform.position, Vector2.down, 1, 1 << 6);
             if (hit == false) return;
             target = hit.collider.GetComponent<ICacthable>();
-            target.Set(mgr.transform,CatchType.Raise);
+            target.Set(mgr.transform);
             target.OnEnterCatch();
         }
         public override void OnUpdate()
         {
             base.OnUpdate();
             target.OnUpdate();
-            if (!(CheckBox() && InputMgr.IsRaiseTheBox())) owner.SwitchState(0);
+            mgr.moveController.JumpLogic(InputMgr.GetSpaceDown());
+            mgr.playerView.Flip(InputMgr.GetHorizontal());
+            if (InputMgr.IsCatchButtonDown()) owner.SwitchState(0);
         }
         public override void OnExit()
         {
