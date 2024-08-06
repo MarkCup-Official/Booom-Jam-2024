@@ -30,6 +30,7 @@ public static class InputMgr
         if (!isActive) return false;
         return Input.GetKeyDown(KeyCode.E);
     }
+    
     public static void Enable()
     {
         isActive = true;

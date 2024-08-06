@@ -34,6 +34,7 @@ public class PlayerView : MonoBehaviour
     {
         float deltaY = SpringCenter.position.y - transform.position.y;
         float height = OriginHeight + SpringAddHeight * deltaY;
+        height = Mathf.Clamp(height, 0.5f, 2f);
         viewObject.transform.localScale = new Vector3(targetDir * 1 / height, height, 1);
     }
     public void Flip(float dir)

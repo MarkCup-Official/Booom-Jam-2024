@@ -20,15 +20,14 @@ public class PlayerMgr : MonoBehaviour
         playerView.Init(this);
         targetCamera.Init(moveController);
         targetCamera.SetPlayer(transform);
-
-
-
-
-
         fsm = new FSM();
         fsm.SetValue("mgr", this);
         fsm.AddState<State_IDLE>(0);
         fsm.AddState<State_CatchBox>(1);
+        fsm.AddState<State_ClimbLadder>(2);
+        fsm.AddTrisition(new List<int>() { 0, 1 }, () => {
+            return moveController.isTouchLadder && InputMgr.GetVertical() != 0f;
+        },2);
         fsm.InitDefaultState(0);
     }
     private void Update()
@@ -48,8 +47,7 @@ namespace GameFramework.FSM.Player
             mgr = owner.GetValue<PlayerMgr>("mgr");
         }
 
-     
-
+    
         public override void OnUpdate()
         {
             mgr.targetCamera.FollowPlayer();
@@ -58,6 +56,7 @@ namespace GameFramework.FSM.Player
         public override void OnFixedUpdate()
         {
             mgr.moveController.HorizontalMove(InputMgr.GetHorizontal());
+            mgr.moveController.AddWaterForce();
         }
 
         public bool CheckBox()
@@ -91,7 +90,6 @@ namespace GameFramework.FSM.Player
         
 
     }
-
     public class State_CatchBox : PlayerState
     {
         private ICacthable target;
@@ -123,5 +121,38 @@ namespace GameFramework.FSM.Player
         {
             target.OnExitCatch();
         }
+    }
+
+    public class State_ClimbLadder : PlayerState
+    {
+        public State_ClimbLadder(FSM owner) : base(owner)
+        {
+
+        }
+
+        public override void OnEnter()
+        {
+            mgr.moveController.SetGravity(false);
+        }
+        public override void OnExit()
+        {
+            mgr.moveController.SetGravity(true);
+        }
+        public override void OnFixedUpdate()
+        {
+            base.OnFixedUpdate(); 
+            mgr.moveController.VerticalMove( 4 *InputMgr.GetVertical());
+        }
+        public override void OnUpdate()
+        {
+            base.OnUpdate();
+
+          
+            mgr.playerView.Flip(InputMgr.GetHorizontal());
+            if (!mgr.moveController.isTouchLadder || InputMgr.GetSpaceDown()) 
+                owner.SwitchState(owner.preState);
+        }
+        
+
     }
 }

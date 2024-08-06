@@ -12,6 +12,7 @@ namespace GameFramework.FSM
         protected Dictionary<int,BaseState> FSMActDic;//×´Ì¬ÁÐ±í
         protected Dictionary<string, object> FSMValueDic;
         private BaseState curState;
+        public BaseState preState;
         private BaseState defaultState;
 
         public FSM()
@@ -85,6 +86,7 @@ namespace GameFramework.FSM
         public virtual void SwitchState(BaseState nextState)
         {
             if (curState == nextState) return;
+            preState = curState;
             curState.OnExit();
             curState = nextState;
             curState.OnEnter();

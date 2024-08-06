@@ -6,7 +6,7 @@ using UnityEngine.U2D;
 public class Water2d : MonoBehaviour
 {
 
-    //public GameObject splash;
+    
     public Material mat;
 
     public GameObject waterSprite;
@@ -20,6 +20,7 @@ public class Water2d : MonoBehaviour
     float[] accelerations;
     LineRenderer Body;
     //
+    BoxCollider2D waterCollider;
    
     GameObject[] spriteShapeObjects;
     SpriteShapeController[] spriteShapeControllers;
@@ -122,6 +123,11 @@ public class Water2d : MonoBehaviour
         //
         int edgecount = Mathf.RoundToInt(Width) * 5;
         int nodecount = edgecount + 1;
+
+        waterCollider = GetComponent < BoxCollider2D>();
+        waterCollider.size = new Vector2(waterWidth, waterHeight);
+        waterCollider.offset = new Vector2(0, -waterHeight * 0.5f);
+
 
         Body = gameObject.AddComponent<LineRenderer>();
 
@@ -239,5 +245,21 @@ public class Water2d : MonoBehaviour
         }
 
     }
-
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.CompareTag("Player"))
+        {
+            PlayerMgr mgr = collision.GetComponent<PlayerMgr>();
+            mgr.moveController.isTouchWater = true;
+            mgr.moveController.WaterHeight = transform.position.y;
+        }
+    }
+    private void OnTriggerExit2D(Collider2D collision)
+    {
+        if (collision.CompareTag("Player"))
+        {
+            PlayerMgr mgr = collision.GetComponent<PlayerMgr>();
+            mgr.moveController.isTouchWater = false;
+        }
+    }
 }

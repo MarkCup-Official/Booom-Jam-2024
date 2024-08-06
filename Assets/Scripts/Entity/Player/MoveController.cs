@@ -6,12 +6,18 @@ public class MoveController : MonoBehaviour
 {
     private float MoveSpeed = 3.5f;
     private float JumpForce = 10f;
+    public float BuoyancyForce = 10;
+    public float WaterResistance = 0.5f;
+    public float WaterHeight = 0;
     private float jumpTimer;
     private float jumpCD = 0.1f;
+    private bool isUsingGravity = true;
     private Rigidbody2D rb;
     public Rigidbody2D springRb;
     private Collider2D _collider;
     private bool isGround;
+    public bool isTouchWater { get; set; }
+    public bool isTouchLadder { get; set; }
     public bool IsGround { get { return isGround; } }
     private float coyoteTimeTimer;//土狼时间
     private PhysicsMaterial2D normalPhysicMat2D;
@@ -37,7 +43,7 @@ public class MoveController : MonoBehaviour
         CoyoteTimer();
         ChangePhysicMat();
         BetterGravity();
-       
+
     }
     public void OnLand()
     {
@@ -45,11 +51,16 @@ public class MoveController : MonoBehaviour
     }
     public void HorizontalMove(float value)
     {
-       
+
         if (value == 0f) return;
         rb.velocity = new Vector2(value * MoveSpeed, rb.velocity.y);
 
 
+    }
+    public void VerticalMove(float value)
+    {
+        if (value == 0f) return;
+        rb.velocity = new Vector2(rb.velocity.x, value);
     }
     /// <summary>
     /// 在空中切换成光滑物理材质，防止卡墙
@@ -61,7 +72,7 @@ public class MoveController : MonoBehaviour
     }
     private void CoyoteTimer()
     {
-        if(isGround)
+        if (isGround)
             coyoteTimeTimer = 0.1f;
         else
             coyoteTimeTimer -= Time.deltaTime;
@@ -82,7 +93,7 @@ public class MoveController : MonoBehaviour
                 return true;
             }
         }
-        
+
         return false;
     }
     /// <summary>
@@ -92,7 +103,7 @@ public class MoveController : MonoBehaviour
     public void JumpLogic(bool IsGetKeyDown)
     {
 
-        if (IsGetKeyDown && (coyoteTimeTimer >0f|| isGround) && jumpTimer + jumpCD <= Time.time)
+        if (IsGetKeyDown && (coyoteTimeTimer > 0f || isGround || isTouchWater) && jumpTimer + jumpCD <= Time.time)
         {
             coyoteTimeTimer = 0f;
             rb.velocity = new Vector2(rb.velocity.x, JumpForce);
@@ -105,7 +116,13 @@ public class MoveController : MonoBehaviour
     /// </summary>
     public void BetterGravity()
     {
-        if (InputMgr.GetSpace() && rb.velocity.y > 0)
+        if (!isUsingGravity)
+        {
+            rb.gravityScale = 0f;
+            return;
+        }
+
+        if (InputMgr.GetSpace() && rb.velocity.y > 0 || isTouchWater)
         {
             rb.gravityScale = 1.5f;
         }
@@ -129,5 +146,26 @@ public class MoveController : MonoBehaviour
     public void SetJumpForce(float value)
     {
         JumpForce = value;
+    }
+
+    //添加水的浮力 和 阻力
+    public void AddWaterForce()
+    {
+        if (!isTouchWater) return;
+
+        float distance = WaterHeight - transform.position.y + 1;
+        distance = Mathf.Clamp(distance, -1, 1);
+        if(isTouchWater && distance > 0)
+        rb.AddForce(new Vector2(0, BuoyancyForce * distance));
+
+        rb.AddForce(-WaterResistance * rb.velocity);
+    }
+    public Rigidbody2D GetRigidBody()
+    {
+        return rb;
+    }
+    public void SetGravity(bool isUsingGravity)
+    {
+        this.isUsingGravity = isUsingGravity;
     }
 }
