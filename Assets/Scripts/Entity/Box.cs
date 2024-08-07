@@ -8,19 +8,22 @@ public class Box : MonoBehaviour, ICacthable
 {
     private Transform owner;
     private Rigidbody2D rb;
+    public SpriteRenderer boxlight;
     public float ThrowForce = 3;
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
         
     }
+    private void Update()
+    {
+        float gb = Mathf.Clamp( Mathf.Abs(Mathf.Sin(Time.time * 4)),0.2f,1f);
+        boxlight.color = new Vector4(1f, gb, gb, 1);
+    }
     public void OnEnterCatch()
     {
        // rb.isKinematic = true;
         gameObject.SetActive(false);
-        
-        
-        
     }
 
     public void OnExitCatch()

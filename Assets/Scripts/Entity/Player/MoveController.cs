@@ -9,6 +9,7 @@ public class MoveController : MonoBehaviour
     public float BuoyancyForce = 10;
     public float WaterResistance = 0.5f;
     public float WaterHeight = 0;
+    public float airResistanceCoefficient = 1;
     private float jumpTimer;
     private float jumpCD = 0.1f;
     private bool isUsingGravity = true;
@@ -45,6 +46,11 @@ public class MoveController : MonoBehaviour
         BetterGravity();
 
     }
+    private void FixedUpdate()
+    {
+        //空气阻力
+        rb.AddForce(-rb.velocity * airResistanceCoefficient);
+    }
     public void OnLand()
     {
         onLandAction?.Invoke();
@@ -61,6 +67,7 @@ public class MoveController : MonoBehaviour
     {
         if (value == 0f) return;
         rb.velocity = new Vector2(rb.velocity.x, value);
+        
     }
     /// <summary>
     /// 在空中切换成光滑物理材质，防止卡墙
@@ -134,6 +141,10 @@ public class MoveController : MonoBehaviour
     public float GetVerticalSpeed()
     {
         return rb.velocity.y;
+    }
+    public float GetHorizontalSpeed()
+    {
+        return rb.velocity.x;
     }
     public Vector2 GetSpeed()
     {

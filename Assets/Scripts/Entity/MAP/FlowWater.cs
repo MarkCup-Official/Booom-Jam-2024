@@ -7,8 +7,9 @@ public class FlowWater : MonoBehaviour
     private BoxCollider2D _collider;
     int waterHeight;
     public GameObject SpriteObject;
+    public GameObject waterEndParticle;
     private PlayerMgr player;
-    private float force = 14;
+    private float force = 7;
     private void Awake()
     {
         _collider = GetComponent<BoxCollider2D>();
@@ -32,6 +33,8 @@ public class FlowWater : MonoBehaviour
             GameObject go = Instantiate(SpriteObject, transform);
             go.transform.position = transform.position + new Vector3(0, -i, 0);
         }
+        GameObject particle = Instantiate(waterEndParticle, transform);
+        particle.transform.position = transform.position + new Vector3(0, -waterHeight, 0);
     }
     
 
@@ -43,7 +46,7 @@ public class FlowWater : MonoBehaviour
         RaycastHit2D hit;
         float distance = 0;
 #if UNITY_EDITOR
-        if (hit = Physics2D.Raycast(transform.position, Vector2.down,100,1<<7))
+        if (hit = Physics2D.Raycast(transform.position, Vector2.down,100,(1<<7)|(1<<9)))
         {
             distance = transform.position.y -  hit.point.y;
 
@@ -67,7 +70,9 @@ public class FlowWater : MonoBehaviour
         {
             return;
         }
-        player.moveController.GetRigidBody().AddForce(new Vector2(0, -force));
+        Rigidbody2D rb = player.moveController.GetRigidBody();
+        rb.AddForce(new Vector2(0, -force));
+        rb.AddForce(1f * -rb.velocity);
     }
     private void OnTriggerEnter2D(Collider2D collision)
     {

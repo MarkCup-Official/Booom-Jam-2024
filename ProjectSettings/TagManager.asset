@@ -14,8 +14,8 @@ TagManager:
   - Box
   - Map
   - Joint
-  - 
-  - 
+  - Water
+  - BackGround
   - 
   - 
   - 
@@ -46,4 +46,7 @@ TagManager:
     locked: 0
   - name: Map
     uniqueID: 2250235203
+    locked: 0
+  - name: CameraSortingLayer
+    uniqueID: 724800871
     locked: 0

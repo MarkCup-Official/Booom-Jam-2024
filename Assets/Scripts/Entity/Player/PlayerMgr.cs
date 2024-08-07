@@ -18,7 +18,7 @@ public class PlayerMgr : MonoBehaviour
         
         playerView = GetComponent<PlayerView>();
         playerView.Init(this);
-        targetCamera.Init(moveController);
+        targetCamera.Init(this);
         targetCamera.SetPlayer(transform);
         fsm = new FSM();
         fsm.SetValue("mgr", this);
@@ -75,8 +75,8 @@ namespace GameFramework.FSM.Player
 
         public override void OnEnter()
         {
-            mgr.playerView.ChangeSprite(0);
-            mgr.moveController.SetJumpForce(10f);
+            mgr.playerView.PlayAnimation("Idle");
+            mgr.moveController.SetJumpForce(12f);
             mgr.moveController.SetSpeed(3.5f);
         }
         public override void OnUpdate()
@@ -101,7 +101,7 @@ namespace GameFramework.FSM.Player
         {
             mgr.moveController.SetJumpForce(8f);
             mgr.moveController.SetSpeed(2.5f);
-            mgr.playerView.ChangeSprite(1);
+            mgr.playerView.PlayAnimation("Idle2");
 
             RaycastHit2D hit = Physics2D.Raycast(mgr.transform.position, Vector2.down, 1, 1 << 6);
             if (hit == false) return;
@@ -115,11 +115,16 @@ namespace GameFramework.FSM.Player
             target.OnUpdate();
             mgr.moveController.JumpLogic(InputMgr.GetSpaceDown());
             mgr.playerView.Flip(InputMgr.GetHorizontal());
-            if (InputMgr.IsCatchButtonDown()) owner.SwitchState(0);
+            if (InputMgr.IsCatchButtonDown())
+            {
+                owner.SwitchState(0);
+                target.OnExitCatch();
+            }
+                
         }
         public override void OnExit()
         {
-            target.OnExitCatch();
+            
         }
     }
 
