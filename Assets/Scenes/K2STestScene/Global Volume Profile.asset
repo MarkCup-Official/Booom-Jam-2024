@@ -1,51 +1,5 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!114 &-7005233518122551464
-MonoBehaviour:
-  m_ObjectHideFlags: 3
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c01700fd266d6914ababb731e09af2eb, type: 3}
-  m_Name: DepthOfField
-  m_EditorClassIdentifier: 
-  active: 0
-  mode:
-    m_OverrideState: 1
-    m_Value: 1
-  gaussianStart:
-    m_OverrideState: 1
-    m_Value: 40
-  gaussianEnd:
-    m_OverrideState: 1
-    m_Value: 1000
-  gaussianMaxRadius:
-    m_OverrideState: 0
-    m_Value: 1
-  highQualitySampling:
-    m_OverrideState: 0
-    m_Value: 0
-  focusDistance:
-    m_OverrideState: 1
-    m_Value: 13.52
-  aperture:
-    m_OverrideState: 0
-    m_Value: 6.2
-  focalLength:
-    m_OverrideState: 0
-    m_Value: 58
-  bladeCount:
-    m_OverrideState: 0
-    m_Value: 5
-  bladeCurvature:
-    m_OverrideState: 0
-    m_Value: 1
-  bladeRotation:
-    m_OverrideState: 0
-    m_Value: 0
 --- !u!114 &-4873068565511833828
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -61,7 +15,7 @@ MonoBehaviour:
   active: 1
   intensity:
     m_OverrideState: 1
-    m_Value: 0.384
+    m_Value: 0.208
 --- !u!114 &-2302996672639471297
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -77,13 +31,13 @@ MonoBehaviour:
   active: 1
   shadows:
     m_OverrideState: 1
-    m_Value: {x: 0.5595255, y: 0.78026533, z: 1, w: 0}
+    m_Value: {x: 0.7636506, y: 0.8335467, z: 1, w: 0}
   midtones:
     m_OverrideState: 0
-    m_Value: {x: 0.7602879, y: 1, z: 0.9555369, w: 0}
+    m_Value: {x: 0.91204524, y: 1, z: 0.9089463, w: 0}
   highlights:
     m_OverrideState: 0
-    m_Value: {x: 1, y: 0.9792728, z: 0.89625126, w: 0}
+    m_Value: {x: 0.44612968, y: 0.7990072, z: 1, w: 0}
   shadowsStart:
     m_OverrideState: 0
     m_Value: 0
@@ -172,7 +126,6 @@ MonoBehaviour:
   - {fileID: 353802226945064}
   - {fileID: -2302996672639471297}
   - {fileID: -475816905989812779}
-  - {fileID: -7005233518122551464}
 --- !u!114 &353802226945064
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -188,7 +141,7 @@ MonoBehaviour:
   active: 1
   temperature:
     m_OverrideState: 1
-    m_Value: -7
+    m_Value: -11
   tint:
     m_OverrideState: 0
     m_Value: -94
@@ -301,10 +254,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 97c23e3b12dc18c42a140437e53d3951, type: 3}
   m_Name: Tonemapping
   m_EditorClassIdentifier: 
-  active: 1
+  active: 0
   mode:
     m_OverrideState: 1
-    m_Value: 0
+    m_Value: 1
   neutralHDRRangeReductionMode:
     m_OverrideState: 0
     m_Value: 2
@@ -344,7 +297,7 @@ MonoBehaviour:
   active: 1
   intensity:
     m_OverrideState: 1
-    m_Value: 0.25
+    m_Value: 0.1
   xMultiplier:
     m_OverrideState: 0
     m_Value: 1

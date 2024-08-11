@@ -9,9 +9,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5161442457128552159}
-  - component: {fileID: 6264362525656187354}
   - component: {fileID: 9003964644248073943}
-  m_Layer: 0
+  - component: {fileID: 8733633863832102727}
+  m_Layer: 4
   m_Name: Water2d
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -33,22 +33,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &6264362525656187354
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6525347868425822496}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d8901c1f0f77094459d61c9c9f39e53f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  mat: {fileID: 2100000, guid: a6770748ebf2190439ecec4c2ec8e0a4, type: 2}
-  waterSprite: {fileID: 6041404829278252786, guid: 4bd6e371ce405e545bddca2d31acafea, type: 3}
-  waterWidth: 20
-  waterHeight: 1
 --- !u!61 &9003964644248073943
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -92,5 +76,22 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 20, y: 1}
+  m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
+--- !u!114 &8733633863832102727
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6525347868425822496}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dc68b77eaeee15a49bc5792096b10117, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  waterSprite: {fileID: 6041404829278252786, guid: 4bd6e371ce405e545bddca2d31acafea, type: 3}
+  flowWaterList: []
+  waterWidth: 10
+  waterHeight: 1
+  IsHoldNeeded: 1

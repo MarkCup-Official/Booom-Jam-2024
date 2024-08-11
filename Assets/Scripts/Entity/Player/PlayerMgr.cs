@@ -3,136 +3,270 @@ using System.Collections.Generic;
 using UnityEngine;
 using GameFramework.FSM;
 using GameFramework.FSM.Player;
+using System;
 public class PlayerMgr : MonoBehaviour
 {
     private FSM fsm;
     public MoveController moveController { get; private set; }
+    public PlayerDetector playerDetector { get; private set; }
     public PlayerView playerView { get; private set; }
     public CameraAction targetCamera;
-    
-    
+    public float speed;
+    public float jumpForce;
+    public string AnimationName = "Idle";
+
+    public Box battery;
 
     private void Awake()
     {
         moveController = GetComponent<MoveController>();
-        
+        playerDetector = GetComponent<PlayerDetector>();
         playerView = GetComponent<PlayerView>();
         playerView.Init(this);
         targetCamera.Init(this);
         targetCamera.SetPlayer(transform);
         fsm = new FSM();
         fsm.SetValue("mgr", this);
-        fsm.AddState<State_IDLE>(0);
-        fsm.AddState<State_CatchBox>(1);
-        fsm.AddState<State_ClimbLadder>(2);
-        fsm.AddTrisition(new List<int>() { 0, 1 }, () => {
-            return moveController.isTouchLadder && InputMgr.GetVertical() != 0f;
-        },2);
-        fsm.InitDefaultState(0);
+        fsm.AddState<PlayerNormalState>(0);
+        fsm.AddState<PlayerSwimState>(1);
+        fsm.AddTrisition(0, () => Input.GetKeyDown(KeyCode.T), 1);
+        fsm.AddTrisition(1, () => Input.GetKeyDown(KeyCode.T), 0);
+        fsm.InitDefaultState(1);
     }
     private void Update()
     {
         fsm.Update();
         fsm.FixedUpdate();
     }
-   
+    private void Start()
+    {
+        RemoveBattery();
+    }
+    public void EquipBattery(Box battery)
+    {
+
+        (fsm.GetCurrentState() as PlayerState).EquipBattery(battery);
+
+    }
+    public Box RemoveBattery()
+    {
+        return (fsm.GetCurrentState() as PlayerState).RemoveBattery();
+
+
+    }
+    public void UpdateState()
+    {
+        moveController.SetJumpForce(jumpForce);//12
+        moveController.SetSpeed(speed); //3.5
+        playerView.PlayAnimation(AnimationName);
+    }
+
 }
 namespace GameFramework.FSM.Player
 {
     public class PlayerState : BaseState
     {
-        public PlayerMgr mgr;
         public PlayerState(FSM owner) : base(owner)
+        {
+        }
+        public virtual void EquipBattery(Box battery)
+        {
+
+        }
+        public virtual Box RemoveBattery()
+        {
+            return null;
+        }
+    }
+
+    public class PlayerNormalState : PlayerState
+    {
+        public PlayerMgr mgr;
+        private FSM childFSM;
+        public PlayerNormalState(FSM owner) : base(owner)
+        {
+            mgr = owner.GetValue<PlayerMgr>("mgr");
+            childFSM = new FSM();
+            childFSM.SetValue("mgr", mgr);
+            childFSM.AddState<State_IDLE>(0);
+            childFSM.AddState<State_ClimbLadder>(1);
+            childFSM.AddTrisition(0, () => mgr.moveController.isTouchLadder && InputMgr.GetVertical() != 0f, 1);
+            childFSM.AddTrisition(1, () =>
+            {
+                return (!mgr.moveController.isTouchLadder || InputMgr.GetSpaceDown());
+            }, 0);
+
+            childFSM.InitDefaultState(0);
+        }
+        public override void OnEnter()
+        {
+            Set();
+        }
+        public override void OnUpdate()
+        {
+            childFSM.Update();
+            mgr.targetCamera.FollowPlayer();
+
+        }
+        public override void OnFixedUpdate()
+        {
+            childFSM.FixedUpdate();
+            mgr.moveController.HorizontalMove(InputMgr.GetHorizontal());
+
+        }
+
+        public override void EquipBattery(Box battery)
+        {
+            mgr.playerView.blueLight.SetActive(true);
+            mgr.battery = battery;
+            Set();
+        }
+        public override Box RemoveBattery()
+        {
+            mgr.playerView.blueLight.SetActive(false);
+            Box go = mgr.battery;
+            mgr.battery = null;
+            Set();
+
+            return go;
+        }
+        public void Set()
+        {
+         
+
+            if (mgr.battery == null)
+            {
+                mgr.speed = 3.5f;
+                mgr.jumpForce = 12f;
+                mgr.AnimationName = "Idle";
+
+            }
+            else
+            {
+                mgr.AnimationName = "Idle2";
+               
+                mgr.speed = 3;
+                mgr.jumpForce = 9f;
+            }
+            
+            mgr.UpdateState();
+        }
+    }
+    public class PlayerSwimState : PlayerState
+    {
+        public PlayerMgr mgr;
+        private FSM childFSM;
+
+
+        public PlayerSwimState(FSM owner) : base(owner)
+        {
+            mgr = owner.GetValue<PlayerMgr>("mgr");
+            childFSM = new FSM();
+            childFSM.SetValue("mgr", mgr);
+            childFSM.AddState<State_IDLE>(0);
+            childFSM.AddState<State_ClimbLadder>(1);
+            childFSM.AddState<State_Swim>(2);
+            childFSM.AddTrisition(0, () => mgr.moveController.isTouchLadder && InputMgr.GetVertical() != 0f, 1);
+            childFSM.AddTrisition(0, () => mgr.moveController.isTouchWater, 2);
+            childFSM.AddTrisition(2, () => !mgr.moveController.isTouchWater, 0);
+            childFSM.AddTrisition(1, () =>
+            {
+                return (!mgr.moveController.isTouchLadder || InputMgr.GetSpaceDown());
+            }, 0);
+
+
+
+            childFSM.InitDefaultState(0);
+        }
+        public override void OnEnter()
+        {
+
+            Set();
+
+        }
+        public override void OnExit()
+        {
+
+        }
+        public override void OnUpdate()
+        {
+            childFSM.Update();
+            mgr.targetCamera.FollowPlayer();
+
+        }
+        public override void OnFixedUpdate()
+        {
+            childFSM.FixedUpdate();
+            mgr.moveController.HorizontalMove(InputMgr.GetHorizontal());
+
+        }
+        public override void EquipBattery(Box battery)
+        {
+            mgr.playerView.blueLight.SetActive(true);
+            mgr.battery = battery;
+
+            Set();
+        }
+        public override Box RemoveBattery()
+        {
+            mgr.playerView.blueLight.SetActive(false);
+
+
+            Box go = mgr.battery;
+            mgr.battery = null;
+            Set();
+            return go;
+        }
+        public void Set()
+        {
+            if (mgr.battery == null)
+            {
+                mgr.speed = 2.5f;
+                mgr.jumpForce = 6f;
+                mgr.AnimationName = "Idle3";
+
+            }
+            else
+            {
+                mgr.AnimationName = "Idle4";
+                mgr.speed = 2;
+                mgr.jumpForce = 6f;
+            }
+            mgr.UpdateState();
+        }
+    }
+
+
+
+    public class State_IDLE : BaseState
+    {
+        public PlayerMgr mgr;
+        public State_IDLE(FSM owner) : base(owner)
         {
             mgr = owner.GetValue<PlayerMgr>("mgr");
         }
 
-    
-        public override void OnUpdate()
-        {
-            mgr.targetCamera.FollowPlayer();
-            
-        }
-        public override void OnFixedUpdate()
-        {
-            mgr.moveController.HorizontalMove(InputMgr.GetHorizontal());
-            mgr.moveController.AddWaterForce();
-        }
-
-        public bool CheckBox()
-        {
-            RaycastHit2D hit = Physics2D.Raycast(mgr.transform.position - new Vector3(0,0.6f,0), Vector2.up, 1.2f, 1 << 6);
-            return hit;
-        }
-    }
-
-    public class State_IDLE : PlayerState
-    {
-        public State_IDLE(FSM owner) : base(owner)
-        {
-            
-        }
-
         public override void OnEnter()
         {
-            mgr.playerView.PlayAnimation("Idle");
-            mgr.moveController.SetJumpForce(12f);
-            mgr.moveController.SetSpeed(3.5f);
+
         }
         public override void OnUpdate()
         {
             base.OnUpdate();
-           
+
             mgr.moveController.JumpLogic(InputMgr.GetSpaceDown());
             mgr.playerView.Flip(InputMgr.GetHorizontal());
-            if (CheckBox() && InputMgr.IsCatchButtonDown() && mgr.moveController.IsGround) owner.SwitchState(1);
+
         }
-        
+
 
     }
-    public class State_CatchBox : PlayerState
+    public class State_ClimbLadder : BaseState
     {
-        private ICacthable target;
-        public State_CatchBox(FSM owner) : base(owner)
-        {
-        }
-
-        public override void OnEnter()
-        {
-            mgr.moveController.SetJumpForce(8f);
-            mgr.moveController.SetSpeed(2.5f);
-            mgr.playerView.PlayAnimation("Idle2");
-
-            RaycastHit2D hit = Physics2D.Raycast(mgr.transform.position, Vector2.down, 1, 1 << 6);
-            if (hit == false) return;
-            target = hit.collider.GetComponent<ICacthable>();
-            target.Set(mgr.transform);
-            target.OnEnterCatch();
-        }
-        public override void OnUpdate()
-        {
-            base.OnUpdate();
-            target.OnUpdate();
-            mgr.moveController.JumpLogic(InputMgr.GetSpaceDown());
-            mgr.playerView.Flip(InputMgr.GetHorizontal());
-            if (InputMgr.IsCatchButtonDown())
-            {
-                owner.SwitchState(0);
-                target.OnExitCatch();
-            }
-                
-        }
-        public override void OnExit()
-        {
-            
-        }
-    }
-
-    public class State_ClimbLadder : PlayerState
-    {
+        public PlayerMgr mgr;
         public State_ClimbLadder(FSM owner) : base(owner)
         {
-
+            mgr = owner.GetValue<PlayerMgr>("mgr");
         }
 
         public override void OnEnter()
@@ -145,19 +279,50 @@ namespace GameFramework.FSM.Player
         }
         public override void OnFixedUpdate()
         {
-            base.OnFixedUpdate(); 
-            mgr.moveController.VerticalMove( 4 *InputMgr.GetVertical());
+            base.OnFixedUpdate();
+            mgr.moveController.VerticalMove(4 * InputMgr.GetVertical());
         }
         public override void OnUpdate()
         {
             base.OnUpdate();
 
-          
+
             mgr.playerView.Flip(InputMgr.GetHorizontal());
-            if (!mgr.moveController.isTouchLadder || InputMgr.GetSpaceDown()) 
-                owner.SwitchState(owner.preState);
+
         }
-        
+
+
+    }
+
+    public class State_Swim : BaseState
+    {
+        public PlayerMgr mgr;
+        public State_Swim(FSM owner) : base(owner)
+        {
+            mgr = owner.GetValue<PlayerMgr>("mgr");
+        }
+
+        public override void OnEnter()
+        {
+
+        }
+        public override void OnUpdate()
+        {
+            base.OnUpdate();
+
+            mgr.playerView.Flip(InputMgr.GetHorizontal());
+
+        }
+        public override void OnExit()
+        {
+
+        }
+        public override void OnFixedUpdate()
+        {
+            base.OnFixedUpdate();
+            mgr.moveController.VerticalMove(3 * InputMgr.GetVertical());
+        }
+
 
     }
 }

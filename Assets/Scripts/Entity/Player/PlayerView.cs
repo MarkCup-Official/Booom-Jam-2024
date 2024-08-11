@@ -15,6 +15,8 @@ public class PlayerView : MonoBehaviour
     public int targetDir = 1;
     public float OriginHeight = 0.8f;
     public float SpringAddHeight = 0.4f;
+    public Rigidbody2D springRb;
+    public GameObject blueLight;
 
     public Sprite[] characterSprites;
 
@@ -23,12 +25,14 @@ public class PlayerView : MonoBehaviour
         this.mgr = mgr;
         mgr.moveController.onLandAction += () =>
         {
+            if (mgr.moveController.GetVerticalSpeed() < -5f)
             landParticle.Emit(20);
         };
       
     }
     private void Start()
     {
+        blueLight.SetActive(false);
         FlipTimer = Time.time;
         EmissionTimer = Time.time;
     }
@@ -70,6 +74,16 @@ public class PlayerView : MonoBehaviour
     public void PlayAnimation(string animName)
     {
         viewAnimator.Play(animName);
+    }
+    public void SetSpringRbIsKinematic(bool isKinematic)
+    {
+        springRb.isKinematic = isKinematic;
+    }
+    public void SetSpringCenterBackToOriginPos()
+    {
+        springRb.isKinematic = true;
+        springRb.transform.localPosition = new Vector3(0, 0.45f, 0);
+        springRb.isKinematic = false;
     }
     
 

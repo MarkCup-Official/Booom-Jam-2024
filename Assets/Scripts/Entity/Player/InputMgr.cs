@@ -28,7 +28,7 @@ public static class InputMgr
     public static bool IsCatchButtonDown()
     {
         if (!isActive) return false;
-        return Input.GetKeyDown(KeyCode.E);
+        return Input.GetKeyDown(KeyCode.F);
     }
     
     public static void Enable()

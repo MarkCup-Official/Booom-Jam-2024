@@ -6,18 +6,20 @@ public class MoveController : MonoBehaviour
 {
     private float MoveSpeed = 3.5f;
     private float JumpForce = 10f;
-    public float BuoyancyForce = 10;
-    public float WaterResistance = 0.5f;
-    public float WaterHeight = 0;
     public float airResistanceCoefficient = 1;
     private float jumpTimer;
     private float jumpCD = 0.1f;
     private bool isUsingGravity = true;
+  
     private Rigidbody2D rb;
     public Rigidbody2D springRb;
     private Collider2D _collider;
+    private bool isUnderControl = true;
+
     private bool isGround;
-    public bool isTouchWater { get; set; }
+    public bool isTouchWater { get { return WaterTouchedCount > 0; } }
+    public int WaterTouchedCount { get; set; }
+    public bool isWearingDivingSuit;
     public bool isTouchLadder { get; set; }
     public bool IsGround { get { return isGround; } }
     private float coyoteTimeTimer;//土狼时间
@@ -26,6 +28,10 @@ public class MoveController : MonoBehaviour
 
     public Transform[] rayCheckPoints;
     public System.Action onLandAction;
+
+    //走路晃动
+    public float WalkShakeStrength=1;
+    public float WalkShakeFrequency= 1;
 
     private void Awake()
     {
@@ -50,24 +56,29 @@ public class MoveController : MonoBehaviour
     {
         //空气阻力
         rb.AddForce(-rb.velocity * airResistanceCoefficient);
+        if(IsGround && GetHorizontalSpeed()!=0f)
+        springRb.AddForce(WalkShakeStrength * Vector2.up * Mathf.Sin(Time.time * WalkShakeFrequency));
     }
+    /// <summary>
+    /// 落地的瞬间触发
+    /// </summary>
     public void OnLand()
     {
         onLandAction?.Invoke();
     }
     public void HorizontalMove(float value)
     {
+        if (!isUnderControl) return;
 
         if (value == 0f) return;
         rb.velocity = new Vector2(value * MoveSpeed, rb.velocity.y);
-
-
     }
     public void VerticalMove(float value)
     {
+        if (!isUnderControl) return;
         if (value == 0f) return;
         rb.velocity = new Vector2(rb.velocity.x, value);
-        
+
     }
     /// <summary>
     /// 在空中切换成光滑物理材质，防止卡墙
@@ -109,7 +120,7 @@ public class MoveController : MonoBehaviour
 
     public void JumpLogic(bool IsGetKeyDown)
     {
-
+        if (!isUnderControl) return;
         if (IsGetKeyDown && (coyoteTimeTimer > 0f || isGround || isTouchWater) && jumpTimer + jumpCD <= Time.time)
         {
             coyoteTimeTimer = 0f;
@@ -123,6 +134,7 @@ public class MoveController : MonoBehaviour
     /// </summary>
     public void BetterGravity()
     {
+
         if (!isUsingGravity)
         {
             rb.gravityScale = 0f;
@@ -159,18 +171,6 @@ public class MoveController : MonoBehaviour
         JumpForce = value;
     }
 
-    //添加水的浮力 和 阻力
-    public void AddWaterForce()
-    {
-        if (!isTouchWater) return;
-
-        float distance = WaterHeight - transform.position.y + 1;
-        distance = Mathf.Clamp(distance, -1, 1);
-        if(isTouchWater && distance > 0)
-        rb.AddForce(new Vector2(0, BuoyancyForce * distance));
-
-        rb.AddForce(-WaterResistance * rb.velocity);
-    }
     public Rigidbody2D GetRigidBody()
     {
         return rb;
@@ -178,5 +178,10 @@ public class MoveController : MonoBehaviour
     public void SetGravity(bool isUsingGravity)
     {
         this.isUsingGravity = isUsingGravity;
+    }
+
+    public void SetIsUnderControl( bool isUnderControl)
+    {
+        this.isUnderControl = isUnderControl;
     }
 }
