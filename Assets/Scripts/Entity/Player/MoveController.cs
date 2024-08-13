@@ -10,7 +10,7 @@ public class MoveController : MonoBehaviour
     private float jumpTimer;
     private float jumpCD = 0.1f;
     private bool isUsingGravity = true;
-  
+
     private Rigidbody2D rb;
     public Rigidbody2D springRb;
     private Collider2D _collider;
@@ -28,6 +28,7 @@ public class MoveController : MonoBehaviour
 
     public Transform[] rayCheckPoints;
     public System.Action onLandAction;
+    private const int groundLayerMask = (1 << 7)|(1<<13);
 
     //×ßÂ·»Î¶¯
     public float WalkShakeStrength=1;
@@ -103,7 +104,7 @@ public class MoveController : MonoBehaviour
     {
         for (int i = 0; i < rayCheckPoints.Length; i++)
         {
-            if (Physics2D.Raycast(rayCheckPoints[i].position, Vector2.down, 0.1f, (1 << 7)))
+            if (Physics2D.Raycast(rayCheckPoints[i].position, Vector2.down, 0.1f, groundLayerMask))
             {
                 if (!isGround)
                     OnLand();

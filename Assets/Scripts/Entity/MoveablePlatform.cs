@@ -9,7 +9,7 @@ public class MoveablePlatform : MonoBehaviour
     public Transform[] rightCheck;
     public Transform[] upCheck;
     public Transform[] downCheck;
-   
+    
 
     float MoveTimer;
     private void Start()
