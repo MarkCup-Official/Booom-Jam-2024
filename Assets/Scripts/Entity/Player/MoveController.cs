@@ -4,14 +4,23 @@ using UnityEngine;
 
 public class MoveController : MonoBehaviour
 {
-    public float MoveSpeed;
-    public float JumpForce;
+    private float MoveSpeed = 3.5f;
+    private float JumpForce = 10f;
+    public float airResistanceCoefficient = 1;
     private float jumpTimer;
     private float jumpCD = 0.1f;
+    private bool isUsingGravity = true;
+
     private Rigidbody2D rb;
     public Rigidbody2D springRb;
     private Collider2D _collider;
+    private bool isUnderControl = true;
+
     private bool isGround;
+    public bool isTouchWater { get { return WaterTouchedCount > 0; } }
+    public int WaterTouchedCount { get; set; }
+    public bool isWearingDivingSuit;
+    public bool isTouchLadder { get; set; }
     public bool IsGround { get { return isGround; } }
     private float coyoteTimeTimer;//土狼时间
     private PhysicsMaterial2D normalPhysicMat2D;
@@ -19,6 +28,11 @@ public class MoveController : MonoBehaviour
 
     public Transform[] rayCheckPoints;
     public System.Action onLandAction;
+    private const int groundLayerMask = (1 << 7)|(1<<13);
+
+    //走路晃动
+    public float WalkShakeStrength=1;
+    public float WalkShakeFrequency= 1;
 
     private void Awake()
     {
@@ -37,18 +51,34 @@ public class MoveController : MonoBehaviour
         CoyoteTimer();
         ChangePhysicMat();
         BetterGravity();
-       
+
     }
+    private void FixedUpdate()
+    {
+        //空气阻力
+        rb.AddForce(-rb.velocity * airResistanceCoefficient);
+        if(IsGround && GetHorizontalSpeed()!=0f)
+        springRb.AddForce(WalkShakeStrength * Vector2.up * Mathf.Sin(Time.time * WalkShakeFrequency));
+    }
+    /// <summary>
+    /// 落地的瞬间触发
+    /// </summary>
     public void OnLand()
     {
         onLandAction?.Invoke();
     }
     public void HorizontalMove(float value)
     {
-       
+        if (!isUnderControl) return;
+
         if (value == 0f) return;
         rb.velocity = new Vector2(value * MoveSpeed, rb.velocity.y);
-
+    }
+    public void VerticalMove(float value)
+    {
+        if (!isUnderControl) return;
+        if (value == 0f) return;
+        rb.velocity = new Vector2(rb.velocity.x, value);
 
     }
     /// <summary>
@@ -61,7 +91,7 @@ public class MoveController : MonoBehaviour
     }
     private void CoyoteTimer()
     {
-        if(isGround)
+        if (isGround)
             coyoteTimeTimer = 0.1f;
         else
             coyoteTimeTimer -= Time.deltaTime;
@@ -74,7 +104,7 @@ public class MoveController : MonoBehaviour
     {
         for (int i = 0; i < rayCheckPoints.Length; i++)
         {
-            if (Physics2D.Raycast(rayCheckPoints[i].position, Vector2.down, 0.1f, (1 << 7)))
+            if (Physics2D.Raycast(rayCheckPoints[i].position, Vector2.down, 0.1f, groundLayerMask))
             {
                 if (!isGround)
                     OnLand();
@@ -82,7 +112,7 @@ public class MoveController : MonoBehaviour
                 return true;
             }
         }
-        
+
         return false;
     }
     /// <summary>
@@ -91,8 +121,8 @@ public class MoveController : MonoBehaviour
 
     public void JumpLogic(bool IsGetKeyDown)
     {
-
-        if (IsGetKeyDown && (coyoteTimeTimer >0f|| isGround) && jumpTimer + jumpCD <= Time.time)
+        if (!isUnderControl) return;
+        if (IsGetKeyDown && (coyoteTimeTimer > 0f || isGround || isTouchWater) && jumpTimer + jumpCD <= Time.time)
         {
             coyoteTimeTimer = 0f;
             rb.velocity = new Vector2(rb.velocity.x, JumpForce);
@@ -105,18 +135,29 @@ public class MoveController : MonoBehaviour
     /// </summary>
     public void BetterGravity()
     {
-        if (InputMgr.GetSpace() && rb.velocity.y > 0)
+
+        if (!isUsingGravity)
         {
-            rb.gravityScale = 1f;
+            rb.gravityScale = 0f;
+            return;
+        }
+
+        if (InputMgr.GetSpace() && rb.velocity.y > 0 || isTouchWater)
+        {
+            rb.gravityScale = 1.5f;
         }
         else
         {
-            rb.gravityScale = 2;
+            rb.gravityScale = 2.5f;
         }
     }
     public float GetVerticalSpeed()
     {
         return rb.velocity.y;
+    }
+    public float GetHorizontalSpeed()
+    {
+        return rb.velocity.x;
     }
     public Vector2 GetSpeed()
     {
@@ -128,6 +169,20 @@ public class MoveController : MonoBehaviour
     }
     public void SetJumpForce(float value)
     {
-        jumpTimer = value;
+        JumpForce = value;
+    }
+
+    public Rigidbody2D GetRigidBody()
+    {
+        return rb;
+    }
+    public void SetGravity(bool isUsingGravity)
+    {
+        this.isUsingGravity = isUsingGravity;
+    }
+
+    public void SetIsUnderControl( bool isUnderControl)
+    {
+        this.isUnderControl = isUnderControl;
     }
 }

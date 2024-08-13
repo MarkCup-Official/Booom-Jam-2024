@@ -4,61 +4,35 @@ using UnityEngine;
 using DG.Tweening;
 [RequireComponent(typeof(BoxCollider2D))]
 [RequireComponent(typeof(Rigidbody2D))]
-public class Box : MonoBehaviour, ICacthable
+public class Box : MonoBehaviour
 {
-    private Transform owner;
-    private CatchType type;
-    private Vector3 offset;
+    
     private Rigidbody2D rb;
+    public SpriteRenderer boxlight;
     public float ThrowForce = 3;
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
         
     }
-    public void OnEnterCatch()
+    public void Lock()
     {
-        rb.isKinematic = true;
-        offset = transform.position - owner.position;
-        if (type == CatchType.Raise)
-        {
-            offset += (Vector3)Vector2.up;
-        }
-    }
 
-    public void OnExitCatch()
+    }
+    public void UnLock()
     {
-        
-        rb.isKinematic = false;
-        if(type == CatchType.Raise)
-        rb.velocity = new Vector2(InputMgr.GetHorizontal(), 1) * ThrowForce;
 
-        //Normalized();
     }
-    /// <summary>
-    /// 规格化位置坐标
-    /// </summary>
-    private void Normalized()
+    private void Update()
     {
-        float x = Mathf.Floor(transform.position.x);
-        float y = Mathf.Floor(transform.position.y);
-        transform.DOMove(new Vector3(x + 0.5f, y + 0.5f, 0), 0.4f);
+        float gb = Mathf.Clamp( Mathf.Abs(Mathf.Sin(Time.time * 4)),0.2f,1f);
+        boxlight.color = new Vector4(gb, gb, 1, 1);
     }
-    
-    public void OnUpdate()
-    {
-        transform.position = owner.transform.position + offset;
-    }
-
-    public void Set(Transform owner, CatchType type)
-    {
-        this.type = type;
-        this.owner = owner;
-    }
+   
 }
 public interface ICacthable
 {
-    public void Set(Transform owner,CatchType type);
+    public void Set(Transform owner);
     /// <summary>
     /// 刚抓起来时执行
     /// </summary>
@@ -72,9 +46,4 @@ public interface ICacthable
     /// </summary>
     public void OnExitCatch();
 
-}
-public enum CatchType
-{
-    Push,
-    Raise,
 }

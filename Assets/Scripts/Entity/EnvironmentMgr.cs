@@ -28,8 +28,6 @@ public class EnvironmentMgr : MonoBehaviour
             float s = _environmentObjects[i].MoveStrength;
             GameObject tar = _environmentObjects[i].target;
             tar.transform.position = OriginPosList[i] + delta * s;
-
-
         }
 
 

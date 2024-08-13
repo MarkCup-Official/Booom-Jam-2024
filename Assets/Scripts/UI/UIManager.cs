@@ -10,6 +10,7 @@ using GameFramework.UI;
 /// </summary>
 public class UIManager : BaseMonoManager<UIManager>
 {
+    public static string TextUIName = "Pannel/TextUI";
     protected override void Awake()
     {
         if (UIManager.Instance != null)
@@ -18,9 +19,9 @@ public class UIManager : BaseMonoManager<UIManager>
             return;
         }
         base.Awake();
-        DontDestroyOnLoad(gameObject);
+        ShowUI(TextUIName, PannelLayer.GameUI);
     }
-
+   
     //已经生成的UI列表
 
     private Dictionary<string, BasePannel> UIPannelsDic = new Dictionary<string, BasePannel>();
@@ -33,16 +34,26 @@ public class UIManager : BaseMonoManager<UIManager>
     public BasePannel InitUI(string PannelAssetID, PannelLayer pannelLayer)
     {
         if (UIPannelsDic.ContainsKey(PannelAssetID)) throw new System.Exception("alredyInit");
-        GameObject UIprefab = Resources.Load<GameObject>("PannelAssetID");
+        GameObject UIprefab = Resources.Load<GameObject>(PannelAssetID);
         BasePannel pannel = Instantiate(UIprefab, transform).GetComponent<BasePannel>();
         pannel.gameObject.SetActive(false);
         pannel.Init(pannelLayer);
         UIPannelsDic.Add(PannelAssetID,pannel);
         return pannel;
     }
+    public BasePannel ShowUI(string PannelAssetID, PannelLayer pannelLayer)
+    {
+        //如果包含
+
+        if (!UIPannelsDic.ContainsKey(PannelAssetID)) InitUI(PannelAssetID,pannelLayer);
+
+        UIPannelsDic[PannelAssetID].OnShowUp();
+        return UIPannelsDic[PannelAssetID];
+    }
     public BasePannel ShowUI(string PannelAssetID)
     {
         //如果包含
+
         if (!UIPannelsDic.ContainsKey(PannelAssetID)) throw new System.NullReferenceException();
        
         UIPannelsDic[PannelAssetID].OnShowUp();
@@ -81,8 +92,4 @@ public class UIManager : BaseMonoManager<UIManager>
 
    
 }
- public enum UI_ListType
-    {
-        
 
-    }

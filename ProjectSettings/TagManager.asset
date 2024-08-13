@@ -3,7 +3,9 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - Interactivable
+  - Trash
   layers:
   - Default
   - TransparentFX
@@ -14,11 +16,11 @@ TagManager:
   - Box
   - Map
   - Joint
-  - 
-  - 
-  - 
-  - 
-  - 
+  - PlayerLimit
+  - BackGround
+  - FWater
+  - CameraFocus
+  - Mesh
   - 
   - 
   - 
@@ -40,4 +42,19 @@ TagManager:
   m_SortingLayers:
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: TileBackGround
+    uniqueID: 1518286317
+    locked: 0
+  - name: Switch
+    uniqueID: 1551691579
+    locked: 0
+  - name: Player
+    uniqueID: 824790639
+    locked: 0
+  - name: Map
+    uniqueID: 2250235203
+    locked: 0
+  - name: CameraSortingLayer
+    uniqueID: 724800871
     locked: 0

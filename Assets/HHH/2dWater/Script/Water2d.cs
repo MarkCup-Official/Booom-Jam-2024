@@ -1,13 +1,17 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.U2D;
 
 public class Water2d : MonoBehaviour
 {
-
-    //public GameObject splash;
+    
+   
     public Material mat;
-    public GameObject watermesh;
+
+    public GameObject waterSprite;
+
+
 
     public float waterWidth;
     public float waterHeight;
@@ -18,13 +22,15 @@ public class Water2d : MonoBehaviour
     float[] accelerations;
     LineRenderer Body;
     //
-    GameObject[] meshobjects;
-    Mesh[] meshes;
+    
+
+    GameObject[] spriteShapeObjects;
+    SpriteShapeController[] spriteShapeControllers;
     //
     GameObject[] colliders;
     //
     const float springconstant = 0.02f;
-    const float damping = 0.04f;
+    const float damping = 0.25f;
     const float spread = 0.05f;
     const float z = 0f;
     //
@@ -32,6 +38,8 @@ public class Water2d : MonoBehaviour
     float left;
     float bottom;
     //
+  
+
 
     [ExecuteInEditMode]
     private void OnDrawGizmos()
@@ -45,27 +53,31 @@ public class Water2d : MonoBehaviour
         Vector3 downLeft = transform.position + new Vector3(-halfWidth, -waterHeight, 0f);
         Vector3 downRight = transform.position + new Vector3(halfWidth, -waterHeight, 0f);
 
-
-        Gizmos.DrawLine(topLeft,topRight);
-        Gizmos.DrawLine(topLeft,downLeft);
-        Gizmos.DrawLine(downRight, topRight);
-        Gizmos.DrawLine(downRight, downLeft);
+        Color color = new Color(0, 0.3f, 1f, 1f);
+        Debug.DrawLine(topLeft, topRight, color);
+        Debug.DrawLine(topLeft, downLeft, color);
+        Debug.DrawLine(downRight, topRight, color);
+        Debug.DrawLine(downRight, downLeft, color);
 
     }
     // Start is called before the first frame update
+
     void Start()
     {
+    
         SpawnWater();
+      
     }
 
     // Update is called once per frame
     void Update()
     {
-        
-    }
 
+    }
+   
     private void FixedUpdate()
     {
+      
         for (int i = 0; i < xpositions.Length; i++)
         {
             float force = springconstant * (ypositions[i] - baseheight) + velocities[i] * damping;
@@ -74,7 +86,7 @@ public class Water2d : MonoBehaviour
             velocities[i] += accelerations[i];
             Body.SetPosition(i, new Vector3(xpositions[i], ypositions[i], z));
         }
-       
+
         //
         float[] leftDeltas = new float[xpositions.Length];
         float[] rightDeltas = new float[xpositions.Length];
@@ -112,7 +124,7 @@ public class Water2d : MonoBehaviour
     }
     public void SpawnWater()
     {
-        float Left = -waterWidth/2f;
+        float Left = -waterWidth / 2f;
         float Width = waterWidth;
         float Top = 0f;
         float Bottom = -waterHeight;
@@ -120,6 +132,11 @@ public class Water2d : MonoBehaviour
         int edgecount = Mathf.RoundToInt(Width) * 5;
         int nodecount = edgecount + 1;
 
+        //waterCollider = GetComponent<BoxCollider2D>();
+        //waterCollider.size = new Vector2(waterWidth, waterHeight);
+        //waterCollider.offset = new Vector2(0, -waterHeight * 0.5f);
+
+     
         Body = gameObject.AddComponent<LineRenderer>();
 
         Body.useWorldSpace = false;
@@ -128,15 +145,16 @@ public class Water2d : MonoBehaviour
         Body.startWidth = Body.endWidth = 0.1f;
         Body.sortingLayerName = "Water";
         Body.material = mat;
-
+         
 
         xpositions = new float[nodecount];
         ypositions = new float[nodecount];
         velocities = new float[nodecount];
         accelerations = new float[nodecount];
 
-        meshobjects = new GameObject[edgecount];
-        meshes = new Mesh[edgecount];
+
+        spriteShapeObjects = new GameObject[edgecount];
+        spriteShapeControllers = new SpriteShapeController[edgecount];
         colliders = new GameObject[edgecount];
 
         baseheight = Top;
@@ -156,29 +174,30 @@ public class Water2d : MonoBehaviour
 
         for (int i = 0; i < edgecount; i++)
         {
-            meshes[i] = new Mesh();
+
 
             Vector3[] Vertices = new Vector3[4];
-            Vertices[0] = new Vector3(xpositions[i], ypositions[i], z);
-            Vertices[1] = new Vector3(xpositions[i + 1], ypositions[i + 1], z);
+            Vertices[1] = new Vector3(xpositions[i], ypositions[i], z);
+            Vertices[0] = new Vector3(xpositions[i + 1], ypositions[i + 1], z);
             Vertices[2] = new Vector3(xpositions[i], bottom, z);
             Vertices[3] = new Vector3(xpositions[i + 1], bottom, z);
-
-            Vector2[] UVs = new Vector2[4];
-            UVs[0] = new Vector2(0, 1);
-            UVs[1] = new Vector2(1, 1);
-            UVs[2] = new Vector2(0, 0);
-            UVs[3] = new Vector2(1, 0);
-
             int[] tris = new int[6] { 0, 1, 3, 3, 2, 0 };
 
-            meshes[i].vertices = Vertices;
-            meshes[i].uv = UVs;
-            meshes[i].triangles = tris;
-            //creat object
-            meshobjects[i] = Instantiate(watermesh, Vector3.zero+transform.position, Quaternion.identity);
-            meshobjects[i].GetComponent<MeshFilter>().mesh = meshes[i];
-            meshobjects[i].transform.parent = transform;
+            spriteShapeObjects[i] = Instantiate(waterSprite, Vector3.zero + transform.position, Quaternion.identity);
+            SpriteShapeController controller = spriteShapeObjects[i].GetComponent<SpriteShapeController>();
+            spriteShapeControllers[i] = controller;
+            for (int j = 0; j < 4; j++)
+            {
+                try
+                {
+                    controller.spline.SetPosition(j, Vertices[j]);
+                }
+                catch
+                {
+                }
+            }
+
+            spriteShapeObjects[i].transform.parent = transform;
 
             //
 
@@ -198,24 +217,33 @@ public class Water2d : MonoBehaviour
 
     void UpdateMeshes()
     {
-        for (int i = 0; i < meshes.Length; i++)
+        for (int i = 0; i < spriteShapeControllers.Length; i++)
         {
 
             Vector3[] Vertices = new Vector3[4];
-            Vertices[0] = new Vector3(xpositions[i], ypositions[i], z);
-            Vertices[1] = new Vector3(xpositions[i + 1], ypositions[i + 1], z);
+            Vertices[1] = new Vector3(xpositions[i], ypositions[i], z);
+            Vertices[0] = new Vector3(xpositions[i + 1], ypositions[i + 1], z);
             Vertices[2] = new Vector3(xpositions[i], bottom, z);
             Vertices[3] = new Vector3(xpositions[i + 1], bottom, z);
 
-            meshes[i].vertices = Vertices;
+            SpriteShapeController controller = spriteShapeControllers[i];
+            for (int j = 0; j < 4; j++)
+            {
+                try
+                {
+                    controller.spline.SetPosition(j, Vertices[j]);
+                }
+                catch
+                {
 
-
+                }
+            }
         }
     }
 
     public void Splash(float xpos, float velocity)
     {
-        if (xpos >= xpositions[0]+transform.position.x && xpos <= xpositions[xpositions.Length - 1]+transform.position.x)
+        if (xpos >= xpositions[0] + transform.position.x && xpos <= xpositions[xpositions.Length - 1] + transform.position.x)
         {
 
             xpos -= xpositions[0] + transform.position.x;
@@ -225,5 +253,7 @@ public class Water2d : MonoBehaviour
         }
 
     }
+   
 
+   
 }
