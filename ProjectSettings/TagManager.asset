@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Interactivable
   - Trash
+  - Wind
   layers:
   - Default
   - TransparentFX

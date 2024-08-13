@@ -17,6 +17,7 @@ public class PlayerView : MonoBehaviour
     public float SpringAddHeight = 0.4f;
     public Rigidbody2D springRb;
     public GameObject blueLight;
+    public GameObject rotatrSprite;
 
     public Sprite[] characterSprites;
 
@@ -71,6 +72,25 @@ public class PlayerView : MonoBehaviour
             targetDir = -1;
         }
     }
+    public void FlipNow(float dir)
+    {
+        if (dir > 0.1f)
+        {
+            targetDir = 1; 
+            viewObject.transform.localScale = new Vector3(targetDir * 1 , 1, 1);
+        }
+        else if (dir < -0.1f)
+        {
+            targetDir = -1;
+            viewObject.transform.localScale = new Vector3(targetDir * 1 , 1, 1);
+        }
+    }
+
+    public void Ratate(float dir)
+    {
+        rotatrSprite.transform.localEulerAngles=new Vector3(0, 0, dir);
+    }
+
     public void PlayAnimation(string animName)
     {
         viewAnimator.Play(animName);
