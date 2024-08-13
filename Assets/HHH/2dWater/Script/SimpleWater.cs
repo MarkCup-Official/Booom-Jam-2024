@@ -60,9 +60,13 @@ public class SimpleWater : MonoBehaviour
         Vector3 topRight = transform.position + new Vector3(halfWidth, 0f, 0f);
         for (int i = 0; i < waterWidth; i++)
         {
-            GameObject go = Instantiate(waterSprite, transform);
-            go.transform.position = topLeft + new Vector3(0.5f, -0.5f) + Vector3.right * i;
-            viewSprites.Add(go);
+            for (int j = 0; j < waterHeight; j++)
+            {
+                GameObject go = Instantiate(waterSprite, transform);
+                go.transform.position = topLeft + new Vector3(0.5f, -0.5f) + Vector3.right * i + Vector3.down * j;
+                viewSprites.Add(go);
+            }
+
         }
 
         for (int i = 0; i < transform.childCount; i++)
@@ -94,6 +98,8 @@ public class SimpleWater : MonoBehaviour
     }
     public void Disappear()
     {
+        if (IsHoldNeeded == false) return;
+
         if (!isActive) return;
         isActive = false;
         foreach (var item in viewSprites)
@@ -125,14 +131,15 @@ public class SimpleWater : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if(templeMgr != null)
+        if (templeMgr != null)
         {
             
-           
+
             float distance = transform.position.y - templeMgr.transform.position.y + 1;
             distance = Mathf.Clamp(distance, 0, 1);
             Rigidbody2D rb = templeMgr.moveController.GetRigidBody();
-            rb.AddForce(new Vector2(0, BuoyancyForce * distance));
+            if (templeMgr.battery == null)
+                rb.AddForce(new Vector2(0, BuoyancyForce * distance));
             rb.AddForce(-WaterResistance * rb.velocity);
         }
     }
@@ -162,7 +169,7 @@ public class SimpleWater : MonoBehaviour
         {
 
             templeMgr.moveController.WaterTouchedCount -= 1;
-            GeneratePop(templeMgr.transform.position + Vector3.down); 
+            GeneratePop(templeMgr.transform.position + Vector3.down);
             templeMgr = null;
         }
     }
