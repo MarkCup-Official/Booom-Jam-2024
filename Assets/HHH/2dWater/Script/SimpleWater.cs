@@ -16,7 +16,7 @@ public class SimpleWater : MonoBehaviour
 
     public float waterWidth;
     public float waterHeight;
-
+    public bool InitView = true;
     BoxCollider2D waterCollider;
     public bool IsHoldNeeded = true;
     private bool isActive;
@@ -58,6 +58,7 @@ public class SimpleWater : MonoBehaviour
         float halfWidth = waterWidth / 2f;
         Vector3 topLeft = transform.position + new Vector3(-halfWidth, 0f, 0f);
         Vector3 topRight = transform.position + new Vector3(halfWidth, 0f, 0f);
+        if(InitView)
         for (int i = 0; i < waterWidth; i++)
         {
             for (int j = 0; j < waterHeight; j++)

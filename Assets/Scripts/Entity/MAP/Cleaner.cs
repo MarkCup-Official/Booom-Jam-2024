@@ -28,7 +28,7 @@ public class Cleaner : MonoBehaviour
         if (!isRayActive)
             return;
 
-        RaycastHit2D hit = Physics2D.Raycast(transform.position,dir, 1, 1 << 7);
+        RaycastHit2D hit = Physics2D.Raycast(transform.position,dir, 1, 1 << 7 | 1<<13);
         if (hit)
             if (hit.collider.CompareTag("Trash"))
             {
