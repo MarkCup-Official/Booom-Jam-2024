@@ -39,6 +39,10 @@ public class SingleText : MonoBehaviour
         text.text = TextContent;
         this.isPersistent = true;
     }
+    public void ChangeText(string content)
+    {
+        text.text = content;
+    }
     private void Update()
     {
         if(!isPersistent)

@@ -8,6 +8,7 @@ public class Cleaner : MonoBehaviour
 
     private bool isRayActive = true;
     private Rigidbody2D rb;
+    public Transform StartPos;
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -22,6 +23,13 @@ public class Cleaner : MonoBehaviour
         CheckSingleDir(Vector2.right);
         CheckSingleDir(Vector2.down);
         CheckSingleDir(Vector2.left) ;
+    }
+    public void ResetPos()
+    {
+        if (StartPos == null) return;
+
+        transform.position = StartPos.transform.position;
+
     }
     public void CheckSingleDir(Vector2 dir)
     {

@@ -13,8 +13,21 @@ public class PlatTrigger : MonoBehaviour, Iinteractive
     public UnityEvent OnBarisOnLeft;
     public UnityEvent OnBarisOnRight;
     public int ControlPos = 1;
+    public bool isable = true;
+
+    public void Enable()
+    {
+        isable = true;
+    }
+    public void Disable()
+    {
+        isable = false;
+    }
+    
     private void Update()
     {
+        if (!isable) return;
+
         trigger.transform.localRotation = Quaternion.Euler(0, 0, -state *40);
         if (state == 1)
         {
