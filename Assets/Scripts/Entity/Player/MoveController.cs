@@ -27,12 +27,18 @@ public class MoveController : MonoBehaviour
     private PhysicsMaterial2D smoothPhysicMat2D;
 
     public Transform[] rayCheckPoints;
+    public Transform[] rayCheckPointsWall;
     public System.Action onLandAction;
     private const int groundLayerMask = (1 << 7)|(1<<13);
 
     //走路晃动
     public float WalkShakeStrength=1;
     public float WalkShakeFrequency= 1;
+
+    //风扇检测
+    public bool OnFan { get; set; }
+    public Vector3 OnFanDirection { get; set; }
+    public float OnFanSpeed { get; set; }
 
     private void Awake()
     {
@@ -51,6 +57,7 @@ public class MoveController : MonoBehaviour
         CoyoteTimer();
         ChangePhysicMat();
         BetterGravity();
+        
 
     }
     private void FixedUpdate()
@@ -81,12 +88,39 @@ public class MoveController : MonoBehaviour
         rb.velocity = new Vector2(rb.velocity.x, value);
 
     }
+    public void AddForce(Vector2 value)
+    {
+        if (!isUnderControl) return;
+        if (value == Vector2.zero) return;
+        rb.velocity += value;
+    }
+    public void LimitVelocity(float maxSpeed)
+    {
+        float currentSpeed = rb.velocity.magnitude;
+        if (currentSpeed > maxSpeed)
+        {
+            rb.velocity = rb.velocity.normalized * maxSpeed;
+        }
+    }
+    public void DisableGravity()
+    {
+        isUsingGravity = false;
+    }
+    public void EnableGravity()
+    {
+        isUsingGravity = true;
+    }
     /// <summary>
     /// 在空中切换成光滑物理材质，防止卡墙
     /// </summary>
     private void ChangePhysicMat()
     {
         if (isGround) _collider.sharedMaterial = normalPhysicMat2D;
+        else _collider.sharedMaterial = smoothPhysicMat2D;
+    }
+    public void ChangePhysicMatSmooth(bool v)
+    {
+        if (!v) _collider.sharedMaterial = normalPhysicMat2D;
         else _collider.sharedMaterial = smoothPhysicMat2D;
     }
     private void CoyoteTimer()
@@ -114,6 +148,25 @@ public class MoveController : MonoBehaviour
         }
 
         return false;
+    }
+    public float CheckIsWall()
+    {
+        for (int i = 0; i < rayCheckPointsWall.Length; i++)
+        {
+            if (Physics2D.Raycast(rayCheckPointsWall[i].position, Vector2.left, 0.8f, groundLayerMask))
+            {
+                return -1;
+            }
+        }
+        for (int i = 0; i < rayCheckPointsWall.Length; i++)
+        {
+            if (Physics2D.Raycast(rayCheckPointsWall[i].position, Vector2.right, 0.8f, groundLayerMask))
+            {
+                return 1;
+            }
+        }
+
+        return 0;
     }
     /// <summary>
     /// handle jump logic

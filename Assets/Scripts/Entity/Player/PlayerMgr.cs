@@ -31,7 +31,7 @@ public class PlayerMgr : MonoBehaviour
         fsm.AddState<PlayerSwimState>(1);
         fsm.AddTrisition(0, () => Input.GetKeyDown(KeyCode.T), 1);
         fsm.AddTrisition(1, () => Input.GetKeyDown(KeyCode.T), 0);
-        fsm.InitDefaultState(1);
+        fsm.InitDefaultState(0);
     }
     private void Update()
     {
@@ -90,11 +90,14 @@ namespace GameFramework.FSM.Player
             childFSM.SetValue("mgr", mgr);
             childFSM.AddState<State_IDLE>(0);
             childFSM.AddState<State_ClimbLadder>(1);
+            childFSM.AddState<State_FanVector>(2);
             childFSM.AddTrisition(0, () => mgr.moveController.isTouchLadder && InputMgr.GetVertical() != 0f, 1);
             childFSM.AddTrisition(1, () =>
             {
                 return (!mgr.moveController.isTouchLadder || InputMgr.GetSpaceDown());
             }, 0);
+            childFSM.AddTrisition(0, () => mgr.moveController.OnFan, 2);
+            childFSM.AddTrisition(2, () => !mgr.moveController.OnFan, 0);
 
             childFSM.InitDefaultState(0);
         }
@@ -111,7 +114,6 @@ namespace GameFramework.FSM.Player
         public override void OnFixedUpdate()
         {
             childFSM.FixedUpdate();
-            mgr.moveController.HorizontalMove(InputMgr.GetHorizontal());
 
         }
 
@@ -250,6 +252,13 @@ namespace GameFramework.FSM.Player
         {
 
         }
+
+        public override void OnFixedUpdate()
+        {
+            base.OnFixedUpdate();
+            mgr.moveController.HorizontalMove(InputMgr.GetHorizontal());
+
+        }
         public override void OnUpdate()
         {
             base.OnUpdate();
@@ -281,6 +290,7 @@ namespace GameFramework.FSM.Player
         {
             base.OnFixedUpdate();
             mgr.moveController.VerticalMove(4 * InputMgr.GetVertical());
+            mgr.moveController.HorizontalMove(InputMgr.GetHorizontal());
         }
         public override void OnUpdate()
         {
@@ -289,6 +299,93 @@ namespace GameFramework.FSM.Player
 
             mgr.playerView.Flip(InputMgr.GetHorizontal());
 
+        }
+
+
+    }
+
+
+    public class State_FanVector : BaseState
+    {
+        public PlayerMgr mgr;
+
+        private float isWall = 0;
+
+        public State_FanVector(FSM owner) : base(owner)
+        {
+            mgr = owner.GetValue<PlayerMgr>("mgr");
+        }
+
+        public override void OnEnter()
+        {
+            base.OnEnter();
+            mgr.moveController.DisableGravity();
+            mgr.moveController.ChangePhysicMatSmooth(true);
+        }
+        public override void OnExit()
+        {
+            base.OnExit();
+            mgr.moveController.EnableGravity();
+            mgr.moveController.ChangePhysicMatSmooth(false);
+            mgr.playerView.Ratate(0);
+        }
+        public override void OnUpdate()
+        {
+            base.OnUpdate();
+
+            //mgr.moveController.JumpLogic(InputMgr.GetSpaceDown());
+            if (isWall < -0.1f)
+            {
+                mgr.playerView.FlipNow(1);
+                mgr.playerView.Ratate(-90);
+            }
+            else if(isWall >0.1f)
+            {
+                mgr.playerView.FlipNow(1);
+                mgr.playerView.Ratate(90);
+            }
+            else
+            {
+                mgr.playerView.Flip(InputMgr.GetHorizontal());
+                mgr.playerView.Ratate(0);
+            }
+            
+            mgr.moveController.HorizontalMove(InputMgr.GetHorizontal());
+
+            if ((InputMgr.GetSpaceDown() || InputMgr.GetHorizontal()>0.5f) && isWall < -0.1f)
+            {
+                mgr.moveController.AddForce(Vector2.right * 100);
+            }
+
+        }
+
+        public override void OnFixedUpdate()
+        {
+            base.OnFixedUpdate();
+
+            isWall = mgr.moveController.CheckIsWall();
+            if (isWall < -0.1f || isWall > 0.1f)
+            {
+                mgr.moveController.AddForce(Vector2.up* InputMgr.GetVertical() * mgr.moveController.OnFanSpeed*0.7f);
+                mgr.moveController.LimitVelocity(2);
+            }
+
+            if (isWall < -0.1f)
+            {
+                mgr.moveController.AddForce(Vector2.left * 0.1f);
+                mgr.moveController.AddForce(mgr.moveController.OnFanDirection * mgr.moveController.OnFanSpeed*0.5f);
+            }
+            else if (isWall > 0.1f)
+            {
+                mgr.moveController.AddForce(Vector2.right * 0.1f);
+                mgr.moveController.AddForce(mgr.moveController.OnFanDirection * mgr.moveController.OnFanSpeed*0.5f);
+            }
+            else
+            {
+                mgr.moveController.AddForce(mgr.moveController.OnFanDirection * mgr.moveController.OnFanSpeed);
+            }
+
+            mgr.moveController.LimitVelocity(8);
         }
 
 
