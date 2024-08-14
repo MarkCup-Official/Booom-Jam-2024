@@ -40,7 +40,7 @@ public class CameraAction : MonoBehaviour
 
 
         targetPos = Vector3.Lerp(targetPos, playerTransform.position + lerpTarget * (target.transform.position - playerTransform.position), LerpMultiplier * Time.deltaTime); 
-        Debug.DrawRay(targetPos, Vector2.down, Color.green, 1);
+       // Debug.DrawRay(targetPos, Vector2.down, Color.green, 1);
         
         float followSpeedMultiplier = Mathf.Pow(transform.position.y - targetPos.y,2);
         followSpeedMultiplier = Mathf.Clamp(followSpeedMultiplier, 1, 100);

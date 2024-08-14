@@ -91817,6 +91817,10 @@ PrefabInstance:
       propertyPath: m_PointLightOuterRadius
       value: 1.65
       objectReference: {fileID: 0}
+    - target: {fileID: 362498966496109210, guid: 024a690f963a263469c16d43a5a6a08f, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.316
+      objectReference: {fileID: 0}
     - target: {fileID: 1250311466676683700, guid: 024a690f963a263469c16d43a5a6a08f, type: 3}
       propertyPath: m_LocalPosition.x
       value: -25.6
@@ -91879,7 +91883,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7840827444480745092, guid: 024a690f963a263469c16d43a5a6a08f, type: 3}
       propertyPath: rayCheckPointsWall.Array.size
-      value: 2
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7840827444480745092, guid: 024a690f963a263469c16d43a5a6a08f, type: 3}
       propertyPath: rayCheckPointsWall.Array.data[0]
@@ -91888,7 +91892,7 @@ PrefabInstance:
     - target: {fileID: 7840827444480745092, guid: 024a690f963a263469c16d43a5a6a08f, type: 3}
       propertyPath: rayCheckPointsWall.Array.data[1]
       value: 
-      objectReference: {fileID: 2008127148}
+      objectReference: {fileID: 0}
     - target: {fileID: 7913573296612191254, guid: 024a690f963a263469c16d43a5a6a08f, type: 3}
       propertyPath: rotatrSprite
       value: 
@@ -91914,7 +91918,8 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 5668061876016257628, guid: 024a690f963a263469c16d43a5a6a08f, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 4857148485580106600, guid: 024a690f963a263469c16d43a5a6a08f, type: 3}
@@ -104945,11 +104950,6 @@ MonoBehaviour:
   waterHeight: 0
   SpriteObject: {fileID: 3049506957625215211, guid: e72e72934fea1bb42a83e8377569cccb, type: 3}
   waterEndParticle: {fileID: 6528493701935288546, guid: 2addb6b8e8442ad449026cc57e4afbcb, type: 3}
---- !u!4 &2008127148 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 8609162398077053232, guid: 024a690f963a263469c16d43a5a6a08f, type: 3}
-  m_PrefabInstance: {fileID: 1067406619}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &2009553064
 GameObject:
   m_ObjectHideFlags: 0
