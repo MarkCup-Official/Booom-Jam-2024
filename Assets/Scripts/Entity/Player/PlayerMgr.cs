@@ -25,6 +25,7 @@ public class PlayerMgr : MonoBehaviour
         playerView.Init(this);
         targetCamera.Init(this);
         targetCamera.SetPlayer(transform);
+
         fsm = new FSM();
         fsm.SetValue("mgr", this);
         fsm.AddState<PlayerNormalState>(0);
@@ -32,6 +33,7 @@ public class PlayerMgr : MonoBehaviour
         fsm.AddTrisition(0, () => Input.GetKeyDown(KeyCode.T), 1);
         fsm.AddTrisition(1, () => Input.GetKeyDown(KeyCode.T), 0);
         fsm.InitDefaultState(0);
+
     }
     private void Update()
     {
@@ -305,15 +307,247 @@ namespace GameFramework.FSM.Player
     }
 
 
+    public class State_FanVector_Air : BaseState
+    {
+        public PlayerMgr mgr;
+        public State_FanVector_Air(FSM owner) : base(owner)
+        {
+            mgr = owner.GetValue<PlayerMgr>("mgr");
+        }
+
+        bool first = true;
+
+        public override void OnEnter()
+        {
+            base.OnEnter();
+            mgr.playerView.Flip(InputMgr.GetHorizontal());
+            mgr.playerView.Rotate(0);
+            if (!first)
+            {
+                if (mgr.battery == null && !first)
+                {
+                    mgr.AnimationName = "FanBall";
+                }
+                else
+                {
+                    mgr.AnimationName = "Idle2";
+                }
+                mgr.UpdateState();
+            }
+            else
+            {
+                first = false;
+            }
+
+        }
+        public override void OnFixedUpdate()
+        {
+            base.OnFixedUpdate();
+
+            mgr.moveController.AddForce(mgr.moveController.OnFanDirection * mgr.moveController.OnFanSpeed);
+        }
+
+
+        public override void OnUpdate()
+        {
+            mgr.playerView.Flip(InputMgr.GetHorizontal());
+            mgr.playerView.Rotate(0);
+        }
+    }
+
+    public class State_FanVector_LiftWall : BaseState
+    {
+        public PlayerMgr mgr;
+        public State_FanVector_LiftWall(FSM owner) : base(owner)
+        {
+            mgr = owner.GetValue<PlayerMgr>("mgr");
+        }
+
+        bool isOnWall = false;
+
+
+        public override void OnEnter()
+        {
+            base.OnEnter();
+            isOnWall = false;
+            mgr.playerView.Flip(InputMgr.GetHorizontal());
+            mgr.playerView.Rotate(0);
+        }
+        public override void OnUpdate()
+        {
+            base.OnUpdate();
+            
+            float v = InputMgr.GetVertical();
+            if (Mathf.Abs(mgr.moveController.isWall) < 0.6f)
+            {
+                if (!isOnWall)
+                {
+                    isOnWall = true;
+                    mgr.playerView.FlipNow(-1);
+                    mgr.playerView.Rotate(90);
+                    if (mgr.battery == null)
+                    {
+                        mgr.AnimationName = "Idle";
+                        mgr.UpdateState();
+                    }
+                }
+                if (v > 0.1f)
+                {
+                    mgr.playerView.FlipNow(-1);
+                    mgr.playerView.Rotate(90);
+                }
+                else if (v < -0.1f)
+                {
+                    mgr.playerView.FlipNow(1);
+                    mgr.playerView.Rotate(-90);
+                }
+            }
+            else
+            {
+                mgr.playerView.Flip(InputMgr.GetHorizontal());
+                mgr.playerView.Rotate(0);
+
+                if (mgr.battery == null&&isOnWall)
+                {
+                    mgr.AnimationName = "FanBall";
+                    mgr.UpdateState();
+                }
+                isOnWall = false;
+            }
+        }
+
+        int shake = 0;
+
+        public override void OnFixedUpdate()
+        {
+            base.OnFixedUpdate();
+
+            mgr.moveController.AddForce(Vector2.up * InputMgr.GetVertical() * mgr.moveController.OnFanSpeed * 0.7f);
+            mgr.moveController.LimitVelocity(2);
+
+
+            mgr.moveController.AddForce(Vector2.left * 0.1f);
+            mgr.moveController.AddForce(mgr.moveController.OnFanDirection * mgr.moveController.OnFanSpeed * 0.5f);
+
+            shake++;
+            if (shake > 200)
+            {
+                mgr.playerView.springRb.velocity = mgr.moveController.OnFanDirection * mgr.moveController.OnFanSpeed * 20;
+                shake = 0;
+            }
+
+
+        }
+    }
+    public class State_FanVector_RightWall : BaseState
+    {
+        public PlayerMgr mgr;
+        public State_FanVector_RightWall(FSM owner) : base(owner)
+        {
+            mgr = owner.GetValue<PlayerMgr>("mgr");
+        }
+
+        bool isOnWall = false;
+
+        public override void OnEnter()
+        {
+            base.OnEnter();
+            isOnWall = false;
+            mgr.playerView.Flip(InputMgr.GetHorizontal());
+            mgr.playerView.Rotate(0);
+        }
+
+        public override void OnUpdate()
+        {
+            base.OnUpdate();
+
+            float v = InputMgr.GetVertical();
+            if (Mathf.Abs(mgr.moveController.isWall) < 0.6f)
+            {
+                if (!isOnWall)
+                {
+                    isOnWall = true;
+                    mgr.playerView.FlipNow(-1);
+                    mgr.playerView.Rotate(-90);
+                    if (mgr.battery == null)
+                    {
+                        mgr.AnimationName = "Idle";
+                        mgr.UpdateState();
+                    }
+                }
+                if (v > 0.1f)
+                {
+                    mgr.playerView.FlipNow(1);
+                    mgr.playerView.Rotate(90);
+                }
+                else if (v < -0.1f)
+                {
+                    mgr.playerView.FlipNow(-1);
+                    mgr.playerView.Rotate(-90);
+                }
+            }
+            else
+            {
+                mgr.playerView.Flip(InputMgr.GetHorizontal());
+                mgr.playerView.Rotate(0);
+
+                if (mgr.battery == null && isOnWall)
+                {
+                    mgr.AnimationName = "FanBall";
+                    mgr.UpdateState();
+                }
+                isOnWall = false;
+            }
+
+        }
+
+
+        int shake = 0;
+        public override void OnFixedUpdate()
+        {
+            base.OnFixedUpdate();
+
+            mgr.moveController.AddForce(Vector2.up * InputMgr.GetVertical() * mgr.moveController.OnFanSpeed * 0.7f);
+            mgr.moveController.LimitVelocity(2);
+
+
+            mgr.moveController.AddForce(Vector2.right * 0.1f);
+            mgr.moveController.AddForce(mgr.moveController.OnFanDirection * mgr.moveController.OnFanSpeed * 0.5f);
+
+
+            shake++;
+            if (shake > 200)
+            {
+                mgr.playerView.springRb.velocity = mgr.moveController.OnFanDirection * mgr.moveController.OnFanSpeed*20;
+                shake = 0;
+            }
+
+        }
+    }
+
     public class State_FanVector : BaseState
     {
         public PlayerMgr mgr;
+        private FSM childFSM;
 
         private float isWall = 0;
 
         public State_FanVector(FSM owner) : base(owner)
         {
             mgr = owner.GetValue<PlayerMgr>("mgr");
+
+
+            childFSM = new FSM();
+            childFSM.SetValue("mgr", mgr);
+            childFSM.AddState<State_FanVector_Air>(0);
+            childFSM.AddState<State_FanVector_LiftWall>(1);
+            childFSM.AddState<State_FanVector_RightWall>(2);
+            childFSM.AddTrisition(0, () => isWall<-0.1f, 1);
+            childFSM.AddTrisition(0, () => isWall > 0.1f, 2);
+            childFSM.AddTrisition(1, () => isWall > -0.1f,0);
+            childFSM.AddTrisition(2, () => isWall < 0.1f, 0);
+
+            childFSM.InitDefaultState(0);
         }
 
         public override void OnEnter()
@@ -321,42 +555,44 @@ namespace GameFramework.FSM.Player
             base.OnEnter();
             mgr.moveController.DisableGravity();
             mgr.moveController.ChangePhysicMatSmooth(true);
+
+            if (mgr.battery == null)
+            {
+                mgr.AnimationName = "FanBall";
+                mgr.UpdateState();
+            }
+            childFSM.SwitchState(0);
+            isJump = 0;
+
+            mgr.playerView.springRb.velocity = mgr.moveController.OnFanDirection * mgr.moveController.OnFanSpeed;
+
         }
         public override void OnExit()
         {
             base.OnExit();
             mgr.moveController.EnableGravity();
             mgr.moveController.ChangePhysicMatSmooth(false);
-            mgr.playerView.Ratate(0);
+            mgr.playerView.Rotate(0);
+
+
+            if (mgr.battery == null)
+            {
+                mgr.AnimationName = "Idle";
+            }
+            else
+            {
+                mgr.AnimationName = "Idle2";
+            }
+            mgr.UpdateState();
         }
+
+        int isJump = 0;
+
         public override void OnUpdate()
         {
             base.OnUpdate();
 
-            //mgr.moveController.JumpLogic(InputMgr.GetSpaceDown());
-            if (isWall < -0.1f)
-            {
-                mgr.playerView.FlipNow(1);
-                mgr.playerView.Ratate(-90);
-            }
-            else if(isWall >0.1f)
-            {
-                mgr.playerView.FlipNow(1);
-                mgr.playerView.Ratate(90);
-            }
-            else
-            {
-                mgr.playerView.Flip(InputMgr.GetHorizontal());
-                mgr.playerView.Ratate(0);
-            }
-            
-            mgr.moveController.HorizontalMove(InputMgr.GetHorizontal());
-
-            if ((InputMgr.GetSpaceDown() || InputMgr.GetHorizontal()>0.5f) && isWall < -0.1f)
-            {
-                mgr.moveController.AddForce(Vector2.right * 100);
-            }
-
+            childFSM.Update();
         }
 
         public override void OnFixedUpdate()
@@ -364,28 +600,37 @@ namespace GameFramework.FSM.Player
             base.OnFixedUpdate();
 
             isWall = mgr.moveController.CheckIsWall();
-            if (isWall < -0.1f || isWall > 0.1f)
+            mgr.moveController.isWall = mgr.moveController.CheckIsWall();
+
+            childFSM.FixedUpdate();
+
+            if(isJump==0)
+            mgr.moveController.HorizontalMove(InputMgr.GetHorizontal());
+
+            if ((InputMgr.GetSpaceDown()) && Mathf.Abs(mgr.moveController.isWall) > -0.6f&&isWall<-0.1f)
             {
-                mgr.moveController.AddForce(Vector2.up* InputMgr.GetVertical() * mgr.moveController.OnFanSpeed*0.7f);
-                mgr.moveController.LimitVelocity(2);
+                isJump = 50;
+                mgr.playerView.springRb.velocity = Vector2.down * 25;
+            }
+            if ((InputMgr.GetSpaceDown()) && Mathf.Abs(mgr.moveController.isWall) < 0.6f && isWall > 0.1f)
+            {
+                isJump = -50;
+                mgr.playerView.springRb.velocity = Vector2.down  * 25;
+            }
+            if (isJump > 0)
+            {
+                mgr.moveController.HorizontalMove(100);
+                //mgr.moveController.AddForce(Vector2.down * mgr.moveController.OnFanSpeed * 0.1f);
+                isJump--;
+            }
+            if (isJump < 0)
+            {
+                mgr.moveController.HorizontalMove(-100);
+                //mgr.moveController.AddForce(Vector2.down * mgr.moveController.OnFanSpeed * 0.1f);
+                isJump++;
             }
 
-            if (isWall < -0.1f)
-            {
-                mgr.moveController.AddForce(Vector2.left * 0.1f);
-                mgr.moveController.AddForce(mgr.moveController.OnFanDirection * mgr.moveController.OnFanSpeed*0.5f);
-            }
-            else if (isWall > 0.1f)
-            {
-                mgr.moveController.AddForce(Vector2.right * 0.1f);
-                mgr.moveController.AddForce(mgr.moveController.OnFanDirection * mgr.moveController.OnFanSpeed*0.5f);
-            }
-            else
-            {
-                mgr.moveController.AddForce(mgr.moveController.OnFanDirection * mgr.moveController.OnFanSpeed);
-            }
-
-            mgr.moveController.LimitVelocity(8);
+            mgr.moveController.LimitVelocity(10);
         }
 
 

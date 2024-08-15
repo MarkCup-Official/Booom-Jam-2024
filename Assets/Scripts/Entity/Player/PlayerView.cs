@@ -74,19 +74,22 @@ public class PlayerView : MonoBehaviour
     }
     public void FlipNow(float dir)
     {
+        float deltaY = SpringCenter.position.y - transform.position.y;
+        float height = OriginHeight + SpringAddHeight * deltaY;
+        height = Mathf.Clamp(height, 0.5f, 2f);
         if (dir > 0.1f)
         {
-            targetDir = 1; 
-            viewObject.transform.localScale = new Vector3(targetDir * 1 , 1, 1);
+            targetDir = 1;
+            viewObject.transform.localScale = new Vector3(targetDir * 1 / height, height, 1);
         }
         else if (dir < -0.1f)
         {
             targetDir = -1;
-            viewObject.transform.localScale = new Vector3(targetDir * 1 , 1, 1);
+            viewObject.transform.localScale = new Vector3(targetDir * 1 / height, height, 1);
         }
     }
 
-    public void Ratate(float dir)
+    public void Rotate(float dir)
     {
         rotatrSprite.transform.localEulerAngles=new Vector3(0, 0, dir);
     }
@@ -105,6 +108,8 @@ public class PlayerView : MonoBehaviour
         springRb.transform.localPosition = new Vector3(0, 0.45f, 0);
         springRb.isKinematic = false;
     }
+
+
     
 
 }

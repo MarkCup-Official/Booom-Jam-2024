@@ -39,6 +39,7 @@ public class MoveController : MonoBehaviour
     public bool OnFan { get; set; }
     public Vector3 OnFanDirection { get; set; }
     public float OnFanSpeed { get; set; }
+    public float isWall { get; set; }
 
     private void Awake()
     {
@@ -153,16 +154,18 @@ public class MoveController : MonoBehaviour
     {
         for (int i = 0; i < rayCheckPointsWall.Length; i++)
         {
-            if (Physics2D.Raycast(rayCheckPointsWall[i].position, Vector2.left, 0.8f, groundLayerMask))
+            RaycastHit2D hit = Physics2D.Raycast(rayCheckPointsWall[i].position, Vector2.left, 0.8f, groundLayerMask);
+            if (hit)
             {
-                return -1;
+                return -Mathf.Abs(hit.point.x- transform.position.x);
             }
         }
         for (int i = 0; i < rayCheckPointsWall.Length; i++)
         {
-            if (Physics2D.Raycast(rayCheckPointsWall[i].position, Vector2.right, 0.8f, groundLayerMask))
+            RaycastHit2D hit = Physics2D.Raycast(rayCheckPointsWall[i].position, Vector2.right, 0.8f, groundLayerMask);
+            if (hit)
             {
-                return 1;
+                return Mathf.Abs(hit.point.x - transform.position.x);
             }
         }
 
