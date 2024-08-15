@@ -93,6 +93,7 @@ namespace GameFramework.FSM.Player
             childFSM.AddState<State_IDLE>(0);
             childFSM.AddState<State_ClimbLadder>(1);
             childFSM.AddState<State_FanVector>(2);
+            childFSM.AddState<State_Normal_Swim>(4);
             childFSM.AddTrisition(0, () => mgr.moveController.isTouchLadder && InputMgr.GetVertical() != 0f, 1);
             childFSM.AddTrisition(1, () =>
             {
@@ -100,6 +101,8 @@ namespace GameFramework.FSM.Player
             }, 0);
             childFSM.AddTrisition(0, () => mgr.moveController.OnFan, 2);
             childFSM.AddTrisition(2, () => !mgr.moveController.OnFan, 0);
+            childFSM.AddTrisition(0, () => mgr.moveController.isInPool, 4);
+            childFSM.AddTrisition(4, () => !mgr.moveController.isInPool, 0);
 
             childFSM.InitDefaultState(0);
         }
@@ -268,6 +271,85 @@ namespace GameFramework.FSM.Player
             mgr.moveController.JumpLogic(InputMgr.GetSpaceDown());
             mgr.playerView.Flip(InputMgr.GetHorizontal());
 
+        }
+
+
+    }
+    public class State_Normal_Swim : BaseState
+    {
+        public PlayerMgr mgr;
+        int isJump = 0;
+        float roof = 0;
+        public State_Normal_Swim(FSM owner) : base(owner)
+        {
+            mgr = owner.GetValue<PlayerMgr>("mgr");
+        }
+
+        public override void OnEnter()
+        {
+            base.OnEnter();
+            if (mgr.battery == null)
+            {
+                mgr.AnimationName = "FanBall";
+                mgr.UpdateState();
+            }
+            isJump = 0;
+        }
+
+        public override void OnExit()
+        {
+            base.OnExit();
+            if (mgr.battery == null)
+            {
+                mgr.AnimationName = "Idle";
+            }
+            else
+            {
+                mgr.AnimationName = "Idle2";
+            }
+            mgr.UpdateState();
+        }
+
+        public override void OnFixedUpdate()
+        {
+            base.OnFixedUpdate();
+            mgr.moveController.HorizontalMove(InputMgr.GetHorizontal());
+
+            if (isJump > 0)
+            {
+                mgr.moveController.VerticalMove(-100);
+                mgr.moveController.LimitVelocity(10);
+                isJump--;
+            }
+
+        }
+        public override void OnUpdate()
+        {
+            base.OnUpdate();
+
+            mgr.playerView.Flip(InputMgr.GetHorizontal());
+
+            roof = mgr.moveController.CheckIsRoof();
+
+            if (InputMgr.GetSpaceDown()&&isJump==0)
+            {
+                if(roof<0.2f)
+                {
+                    isJump = 30;
+                }
+                else
+                {
+                    mgr.moveController.JumpLogic(true);
+                }
+            }
+            if (roof < 0.2f)
+            {
+                mgr.playerView.Rotate(180);
+            }
+            else
+            {
+                mgr.playerView.Rotate(0);
+            }
         }
 
 

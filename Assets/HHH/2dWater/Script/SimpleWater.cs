@@ -153,6 +153,7 @@ public class SimpleWater : MonoBehaviour
         {
             PlayerMgr mgr = collision.GetComponent<PlayerMgr>();
             mgr.moveController.WaterTouchedCount += 1;
+            mgr.moveController.PoolTouchedCount += 1;
             GeneratePop(mgr.transform.position + Vector3.down);
             templeMgr = mgr;
         }
@@ -170,6 +171,7 @@ public class SimpleWater : MonoBehaviour
         {
 
             templeMgr.moveController.WaterTouchedCount -= 1;
+            templeMgr.moveController.PoolTouchedCount -= 1;
             GeneratePop(templeMgr.transform.position + Vector3.down);
             templeMgr = null;
         }
