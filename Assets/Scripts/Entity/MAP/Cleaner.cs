@@ -36,17 +36,26 @@ public class Cleaner : MonoBehaviour
         if (!isRayActive)
             return;
 
-        RaycastHit2D hit = Physics2D.Raycast(transform.position,dir, 1, 1 << 7 | 1<<13);
+        const float time = 0.3f;
+        RaycastHit2D hit = Physics2D.Raycast(transform.position,dir, 1.4f, 1 << 7 | 1<<13);
         if (hit)
             if (hit.collider.CompareTag("Trash"))
             {
                 if (hit.collider.TryGetComponent(out Trash trash))
                 {
-                    hit.collider.gameObject.SetActive(false);
-                    transform.DOMove(hit.collider.transform.position, 0.1f);
+                    rb.velocity = Vector2.zero;
+                    hit.collider.gameObject.SetActive(false); 
                     isRayActive = false;
                     rb.isKinematic = true;
-                    TimeDelay.Instance.Delay(0.1f, () =>
+                    transform.DOMove(hit.collider.transform.position, time - 0.1f);
+                    if (trash.DestroyTheCleaner == true)
+                    {
+                        gameObject.SetActive(false);
+                        return;
+                    }
+
+                   
+                    TimeDelay.Instance.Delay(time, () =>
                     {
                         isRayActive = true;
                         rb.isKinematic = false;

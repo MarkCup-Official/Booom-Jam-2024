@@ -17,11 +17,11 @@ public class Box : MonoBehaviour
     }
     public void Lock()
     {
-
+        rb.isKinematic = true;
     }
     public void UnLock()
     {
-
+        rb.isKinematic = false;
     }
     private void Update()
     {

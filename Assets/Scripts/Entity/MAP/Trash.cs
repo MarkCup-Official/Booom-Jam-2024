@@ -4,5 +4,5 @@ using UnityEngine;
 
 public class Trash : MonoBehaviour
 {
-    
+    public bool DestroyTheCleaner = false;
 }

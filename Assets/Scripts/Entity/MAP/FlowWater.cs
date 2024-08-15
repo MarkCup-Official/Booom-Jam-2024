@@ -45,6 +45,8 @@ public class FlowWater : MonoBehaviour
             if(waterHeight != newHeight) Invoke(nameof(UpdateView),0.01f);
             waterHeight = newHeight;
             GenerateParticleAtEnd();
+
+           
         }
         else
         {

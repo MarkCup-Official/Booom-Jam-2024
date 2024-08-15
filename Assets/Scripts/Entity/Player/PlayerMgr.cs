@@ -6,7 +6,7 @@ using GameFramework.FSM.Player;
 using System;
 public class PlayerMgr : MonoBehaviour
 {
-    private FSM fsm;
+    public FSM fsm;
     public MoveController moveController { get; private set; }
     public PlayerDetector playerDetector { get; private set; }
     public PlayerView playerView { get; private set; }

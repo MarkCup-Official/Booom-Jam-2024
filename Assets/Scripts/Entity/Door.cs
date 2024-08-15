@@ -13,15 +13,18 @@ public class Door : MonoBehaviour, Iinteractive
     public Color whenDoorIsLocked;
     public Color whenDoorIsUnLocked;
     private SingleText text;
-
+    public string doorName = "自动门";
     private void Start()
     {
 
 
         animator = GetComponent<Animator>();
        
-        text = (UIManager.Instance.GetUI(UIManager.TextUIName) as TextUI).Show("自动门[已锁住]", transform, Vector3.down);
+        text = (UIManager.Instance.GetUI(UIManager.TextUIName) as TextUI).Show($"{doorName}[已锁住]", transform, Vector3.down);
         text.DisShow();
+
+        if (isLocked)
+            OnDoorClose();
     }
     public void Lock()
     {

@@ -10,6 +10,7 @@ public class BatteryBase : MonoBehaviour,Iinteractive
     public UnityEvent OnBatteryEquipped;
     public UnityEvent OnBatteryTaken;
     public UnityEvent OnBatteryEquippedUpdate;
+    public bool isBatteryAbleToMove = true;
     private void Start()
     {
         text = (UIManager.Instance.GetUI(UIManager.TextUIName) as TextUI).Show("µç³Ø»ù×ù", transform, 0.5f * Vector3.down);
@@ -34,6 +35,11 @@ public class BatteryBase : MonoBehaviour,Iinteractive
         if (battery != null)
         {
             // battery.UnLock();
+            if (!isBatteryAbleToMove)
+            {
+                battery.transform.SetParent(null);
+                battery.UnLock();
+            }
             playerMgr.EquipBattery(battery);
             battery.gameObject.SetActive(false);
             battery = null;
@@ -43,8 +49,13 @@ public class BatteryBase : MonoBehaviour,Iinteractive
         {
             // battery.Lock();
            
-            battery = playerMgr.RemoveBattery();
+            battery = playerMgr.RemoveBattery(); 
             if (battery == null) return;
+            if (!isBatteryAbleToMove)
+            { battery.Lock();
+                battery.transform.SetParent(transform);
+            }
+            
             battery.gameObject.SetActive(true);
             battery.transform.position = transform.position; 
             OnBatteryEquipped?.Invoke();

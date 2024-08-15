@@ -9,13 +9,17 @@ public class MoveablePlatform : MonoBehaviour
     public Transform[] rightCheck;
     public Transform[] upCheck;
     public Transform[] downCheck;
-    
+    private Vector2 startPos;
 
     float MoveTimer;
     private void Start()
     {
         MoveTimer = Time.time;
-
+        startPos = transform.position;
+    }
+    public void ResetPos()
+    {
+        transform.position = startPos;
     }
     [ExecuteInEditMode]
     private void OnDrawGizmos()
