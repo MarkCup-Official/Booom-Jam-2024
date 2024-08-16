@@ -56,7 +56,7 @@ public class Wind : MonoBehaviour
         if (collision.CompareTag("Player"))
         {
             PlayerMgr mgr = collision.GetComponent<PlayerMgr>();
-            mgr.moveController.OnFan = true;
+            mgr.moveController.OnFanC ++;
             mgr.moveController.OnFanDirection = GetDirection();
             mgr.moveController.OnFanSpeed = speed;
         }
@@ -66,9 +66,9 @@ public class Wind : MonoBehaviour
         if (collision.CompareTag("Player"))
         {
             PlayerMgr mgr = collision.GetComponent<PlayerMgr>();
-            mgr.moveController.OnFan = false;
-            mgr.moveController.OnFanDirection = Vector3.zero;
-            mgr.moveController.OnFanSpeed = 0;
+            mgr.moveController.OnFanC--;
+            //mgr.moveController.OnFanDirection = Vector3.zero;
+            //mgr.moveController.OnFanSpeed = 0;
         }
     }
 

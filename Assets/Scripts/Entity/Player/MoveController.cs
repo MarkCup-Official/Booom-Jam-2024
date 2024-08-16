@@ -39,7 +39,8 @@ public class MoveController : MonoBehaviour
     public float WalkShakeFrequency= 1;
 
     //·çÉÈ¼ì²â
-    public bool OnFan { get; set; }
+    public bool OnFan { get { return OnFanC>0; } }
+    public int  OnFanC { get; set; }
     public Vector3 OnFanDirection { get; set; }
     public float OnFanSpeed { get; set; }
     public float isWall { get; set; }
@@ -177,12 +178,20 @@ public class MoveController : MonoBehaviour
 
     public float CheckIsRoof()
     {
-        for (int i = 0; i < rayCheckPointsWall.Length; i++)
+        for (int i = 0; i < rayCheckPoints.Length; i++)
         {
-            RaycastHit2D hit = Physics2D.Raycast(rayCheckPointsWall[i].position, Vector2.up, 0.8f, groundLayerMask);
+            RaycastHit2D hit = Physics2D.Raycast(rayCheckPoints[i].position, Vector2.up, 0.8f + 0.35f, groundLayerMask);
             if (hit)
             {
                 return Mathf.Abs(hit.point.y - transform.position.y);
+            }
+        }
+        for (int i = 0; i < rayCheckPoints.Length; i++)
+        {
+            RaycastHit2D hit = Physics2D.Raycast(rayCheckPoints[i].position, Vector2.down, 0.8f - 0.35f, groundLayerMask);
+            if (hit)
+            {
+                return -Mathf.Abs(hit.point.y - transform.position.y);
             }
         }
 
