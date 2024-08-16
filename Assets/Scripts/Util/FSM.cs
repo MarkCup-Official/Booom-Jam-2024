@@ -83,6 +83,18 @@ namespace GameFramework.FSM
         {
             return curState;
         }
+        public int GetCurrentStateID()
+        {
+            BaseState s = GetCurrentState();
+            foreach(var item in FSMActDic)
+            {
+                if (item.Value == s)
+                {
+                    return item.Key;
+                }
+            }
+            return -1;
+        }
         public virtual void SwitchState(BaseState nextState)
         {
             if (curState == nextState) return;

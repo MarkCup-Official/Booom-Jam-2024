@@ -92,7 +92,7 @@ namespace GameFramework.FSM.Player
             childFSM.SetValue("mgr", mgr);
             childFSM.AddState<State_IDLE>(0);
             childFSM.AddState<State_ClimbLadder>(1);
-            childFSM.AddState<State_FanVector>(2);
+            childFSM.AddState<State_Normal_Fan>(2);
             childFSM.AddState<State_Normal_Swim>(4);
             childFSM.AddTrisition(0, () => mgr.moveController.isTouchLadder && InputMgr.GetVertical() != 0f, 1);
             childFSM.AddTrisition(1, () =>
@@ -333,16 +333,16 @@ namespace GameFramework.FSM.Player
 
             if (InputMgr.GetSpaceDown()&&isJump==0)
             {
-                if(roof<0.2f)
+                if(0 < roof && roof <0.2f)
                 {
-                    isJump = 30;
+                    isJump = 25;
                 }
                 else
                 {
                     mgr.moveController.JumpLogic(true);
                 }
             }
-            if (roof < 0.2f)
+            if (0< roof &&roof< 0.2f)
             {
                 mgr.playerView.Rotate(180);
             }
@@ -389,10 +389,10 @@ namespace GameFramework.FSM.Player
     }
 
 
-    public class State_FanVector_Air : BaseState
+    public class State_Normal_Fan_Air : BaseState
     {
         public PlayerMgr mgr;
-        public State_FanVector_Air(FSM owner) : base(owner)
+        public State_Normal_Fan_Air(FSM owner) : base(owner)
         {
             mgr = owner.GetValue<PlayerMgr>("mgr");
         }
@@ -406,6 +406,7 @@ namespace GameFramework.FSM.Player
             mgr.playerView.Rotate(0);
             if (!first)
             {
+                /*
                 if (mgr.battery == null && !first)
                 {
                     mgr.AnimationName = "FanBall";
@@ -415,6 +416,7 @@ namespace GameFramework.FSM.Player
                     mgr.AnimationName = "Idle2";
                 }
                 mgr.UpdateState();
+                */
             }
             else
             {
@@ -437,10 +439,49 @@ namespace GameFramework.FSM.Player
         }
     }
 
-    public class State_FanVector_LiftWall : BaseState
+    public class State_Normal_Fan_Roof : BaseState
     {
         public PlayerMgr mgr;
-        public State_FanVector_LiftWall(FSM owner) : base(owner)
+        public State_Normal_Fan_Roof(FSM owner) : base(owner)
+        {
+            mgr = owner.GetValue<PlayerMgr>("mgr");
+        }
+
+        int isJump = 0;
+
+        public override void OnEnter()
+        {
+            base.OnEnter();
+
+            mgr.playerView.Rotate(180);
+        }
+
+        public override void OnFixedUpdate()
+        {
+            base.OnFixedUpdate();
+            //mgr.moveController.HorizontalMove(InputMgr.GetHorizontal());
+
+            mgr.moveController.AddForce(Vector2.up * 0.1f);
+
+            if (isJump > 0)
+            {
+                mgr.moveController.VerticalMove(-100);
+                isJump--;
+            }
+
+        }
+        public override void OnUpdate()
+        {
+            base.OnUpdate();
+
+            mgr.playerView.Flip(-InputMgr.GetHorizontal());
+        }
+    }
+
+    public class State_Normal_Fan_LeftWall : BaseState
+    {
+        public PlayerMgr mgr;
+        public State_Normal_Fan_LeftWall(FSM owner) : base(owner)
         {
             mgr = owner.GetValue<PlayerMgr>("mgr");
         }
@@ -467,11 +508,12 @@ namespace GameFramework.FSM.Player
                     isOnWall = true;
                     mgr.playerView.FlipNow(-1);
                     mgr.playerView.Rotate(90);
+                    /*
                     if (mgr.battery == null)
                     {
                         mgr.AnimationName = "Idle";
                         mgr.UpdateState();
-                    }
+                    }*/
                 }
                 if (v > 0.1f)
                 {
@@ -488,12 +530,12 @@ namespace GameFramework.FSM.Player
             {
                 mgr.playerView.Flip(InputMgr.GetHorizontal());
                 mgr.playerView.Rotate(0);
-
+                /*
                 if (mgr.battery == null&&isOnWall)
                 {
                     mgr.AnimationName = "FanBall";
                     mgr.UpdateState();
-                }
+                }*/
                 isOnWall = false;
             }
         }
@@ -521,10 +563,10 @@ namespace GameFramework.FSM.Player
 
         }
     }
-    public class State_FanVector_RightWall : BaseState
+    public class State_Normal_Fan_RightWall : BaseState
     {
         public PlayerMgr mgr;
-        public State_FanVector_RightWall(FSM owner) : base(owner)
+        public State_Normal_Fan_RightWall(FSM owner) : base(owner)
         {
             mgr = owner.GetValue<PlayerMgr>("mgr");
         }
@@ -551,11 +593,12 @@ namespace GameFramework.FSM.Player
                     isOnWall = true;
                     mgr.playerView.FlipNow(-1);
                     mgr.playerView.Rotate(-90);
+                    /*
                     if (mgr.battery == null)
                     {
                         mgr.AnimationName = "Idle";
                         mgr.UpdateState();
-                    }
+                    }*/
                 }
                 if (v > 0.1f)
                 {
@@ -573,11 +616,12 @@ namespace GameFramework.FSM.Player
                 mgr.playerView.Flip(InputMgr.GetHorizontal());
                 mgr.playerView.Rotate(0);
 
-                if (mgr.battery == null && isOnWall)
-                {
-                    mgr.AnimationName = "FanBall";
-                    mgr.UpdateState();
-                }
+                /*
+            if (mgr.battery == null && isOnWall)
+            {
+                mgr.AnimationName = "FanBall";
+                mgr.UpdateState();
+            }*/
                 isOnWall = false;
             }
 
@@ -607,27 +651,40 @@ namespace GameFramework.FSM.Player
         }
     }
 
-    public class State_FanVector : BaseState
+    public class State_Normal_Fan : BaseState
     {
         public PlayerMgr mgr;
         private FSM childFSM;
 
         private float isWall = 0;
+        private float isRoof = 0;
 
-        public State_FanVector(FSM owner) : base(owner)
+        public State_Normal_Fan(FSM owner) : base(owner)
         {
             mgr = owner.GetValue<PlayerMgr>("mgr");
 
 
             childFSM = new FSM();
             childFSM.SetValue("mgr", mgr);
-            childFSM.AddState<State_FanVector_Air>(0);
-            childFSM.AddState<State_FanVector_LiftWall>(1);
-            childFSM.AddState<State_FanVector_RightWall>(2);
+            childFSM.AddState<State_Normal_Fan_Air>(0);
+            childFSM.AddState<State_Normal_Fan_LeftWall>(1);
+            childFSM.AddState<State_Normal_Fan_RightWall>(2);
+            childFSM.AddState<State_Normal_Fan_Roof>(3);
             childFSM.AddTrisition(0, () => isWall<-0.1f, 1);
+            childFSM.AddTrisition(1, () => isWall > -0.1f, 0);
             childFSM.AddTrisition(0, () => isWall > 0.1f, 2);
-            childFSM.AddTrisition(1, () => isWall > -0.1f,0);
             childFSM.AddTrisition(2, () => isWall < 0.1f, 0);
+            childFSM.AddTrisition(0, () => 0 < isRoof && isRoof < 0.2f, 3);
+            childFSM.AddTrisition(3, () => isRoof > 0.2f, 0);
+
+            childFSM.AddTrisition(2, () => isWall < -0.1f && InputMgr.GetHorizontal() < -0.1f, 1);
+            childFSM.AddTrisition(3, () => isWall < -0.1f && InputMgr.GetHorizontal() < -0.1f, 1);
+            childFSM.AddTrisition(1, () => isWall > 0.1f && InputMgr.GetHorizontal() > 0.1f, 2);
+            childFSM.AddTrisition(3, () => isWall > 0.1f && InputMgr.GetHorizontal() > 0.1f, 2);
+            childFSM.AddTrisition(1, () => 0 < isRoof && isRoof < 0.2f && InputMgr.GetVertical() > 0.1f, 3);
+            childFSM.AddTrisition(2, () => 0 < isRoof && isRoof < 0.2f && InputMgr.GetVertical() > 0.1f, 3);
+            childFSM.AddTrisition(1, () => isRoof < 0 && isRoof > -0.2f && InputMgr.GetVertical() < -0.1f, 0);
+            childFSM.AddTrisition(2, () => isRoof < 0 && isRoof > -0.2f && InputMgr.GetVertical() < -0.1f, 0);
 
             childFSM.InitDefaultState(0);
         }
@@ -669,11 +726,13 @@ namespace GameFramework.FSM.Player
         }
 
         int isJump = 0;
+        int isJumpV = 0;
 
         public override void OnUpdate()
         {
             base.OnUpdate();
 
+            isRoof = mgr.moveController.CheckIsRoof();
             childFSM.Update();
         }
 
@@ -681,35 +740,57 @@ namespace GameFramework.FSM.Player
         {
             base.OnFixedUpdate();
 
+            int currentState =childFSM.GetCurrentStateID();
+
             isWall = mgr.moveController.CheckIsWall();
             mgr.moveController.isWall = mgr.moveController.CheckIsWall();
 
             childFSM.FixedUpdate();
 
-            if(isJump==0)
-            mgr.moveController.HorizontalMove(InputMgr.GetHorizontal());
+            if (isJump == 0 && (mgr.moveController.OnFanDirection != Vector3.left && mgr.moveController.OnFanDirection != Vector3.right))
+                mgr.moveController.HorizontalMove(InputMgr.GetHorizontal());
+            if (isJumpV == 0&&(mgr.moveController.OnFanDirection != Vector3.down&& mgr.moveController.OnFanDirection != Vector3.up))
+                mgr.moveController.VerticalMove(InputMgr.GetHorizontal());
 
-            if ((InputMgr.GetSpaceDown()) && Mathf.Abs(mgr.moveController.isWall) > -0.6f&&isWall<-0.1f)
+            if ((InputMgr.GetSpaceDown()) && Mathf.Abs(mgr.moveController.isWall) < 0.6f &&isWall<-0.1f&& currentState==1)
             {
                 isJump = 50;
                 mgr.playerView.springRb.velocity = Vector2.down * 25;
             }
-            if ((InputMgr.GetSpaceDown()) && Mathf.Abs(mgr.moveController.isWall) < 0.6f && isWall > 0.1f)
+            if ((InputMgr.GetSpaceDown()) && Mathf.Abs(mgr.moveController.isWall) < 0.6f && isWall > 0.1f && currentState == 2)
             {
                 isJump = -50;
                 mgr.playerView.springRb.velocity = Vector2.down  * 25;
             }
+            if ((InputMgr.GetSpaceDown()) && Mathf.Abs(isRoof) < 0.2f && isRoof < 0 && currentState == 0)
+            {
+                isJumpV = 50;
+                mgr.playerView.springRb.velocity = Vector2.down * 25;
+            }
+            if ((InputMgr.GetSpaceDown()) && Mathf.Abs(isRoof) < 0.2f && isRoof > 0 && currentState == 3)
+            {
+                isJumpV = -50;
+                mgr.playerView.springRb.velocity = Vector2.down * 25;
+            }
             if (isJump > 0)
             {
                 mgr.moveController.HorizontalMove(100);
-                //mgr.moveController.AddForce(Vector2.down * mgr.moveController.OnFanSpeed * 0.1f);
                 isJump--;
             }
             if (isJump < 0)
             {
                 mgr.moveController.HorizontalMove(-100);
-                //mgr.moveController.AddForce(Vector2.down * mgr.moveController.OnFanSpeed * 0.1f);
                 isJump++;
+            }
+            if (isJumpV > 0)
+            {
+                mgr.moveController.VerticalMove(100);
+                isJumpV--;
+            }
+            if (isJumpV < 0)
+            {
+                mgr.moveController.VerticalMove(-100);
+                isJumpV++;
             }
 
             mgr.moveController.LimitVelocity(10);
