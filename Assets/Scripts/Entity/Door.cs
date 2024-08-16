@@ -53,12 +53,19 @@ public class Door : MonoBehaviour, Iinteractive
         isOpen = true;
         animator.Play("DoorOpen");
         _collider.enabled = false;
+        SoundManager.Instance.PlaySound("door_1", 0.4f);
     }
     private void OnDoorClose()
     {
+        if (isOpen &&!isLocked)
+        {
+            SoundManager.Instance.PlaySound("door_1", 0.4f);
+        }
         isOpen = false;
         animator.Play("DoorClose");
         _collider.enabled = true;
+        
+        
     }
 
     public void OnPlayerEnter(PlayerMgr mgr)

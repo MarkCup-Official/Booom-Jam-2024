@@ -10,7 +10,7 @@ public class MoveablePlatform : MonoBehaviour
     public Transform[] upCheck;
     public Transform[] downCheck;
     private Vector2 startPos;
-
+   
     float MoveTimer;
     private void Start()
     {
@@ -55,6 +55,7 @@ public class MoveablePlatform : MonoBehaviour
             if (IsHorizontalMoveable(targetDir))
             {
                 const float moveTime = 0.4f;
+                SoundManager.Instance.PlaySound("wood2",0.3f);
                 transform.DOMoveX(transform.position.x + targetDir, moveTime);
             }
         }
@@ -67,6 +68,7 @@ public class MoveablePlatform : MonoBehaviour
             if (IsVerticalMoveable(targetDir))
             {
                 const float moveTime = 0.4f;
+                SoundManager.Instance.PlaySound("wood2", 0.3f);
                 transform.DOMoveY(transform.position.y + targetDir, moveTime);
             }
         }

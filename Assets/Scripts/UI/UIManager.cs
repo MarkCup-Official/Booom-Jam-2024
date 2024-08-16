@@ -19,6 +19,7 @@ public class UIManager : BaseMonoManager<UIManager>
             return;
         }
         base.Awake();
+       
         ShowUI(TextUIName, PannelLayer.GameUI);
     }
    
