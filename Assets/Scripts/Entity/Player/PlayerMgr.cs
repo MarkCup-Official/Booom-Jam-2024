@@ -308,6 +308,7 @@ namespace GameFramework.FSM.Player
                 mgr.AnimationName = "Idle2";
             }
             mgr.UpdateState();
+            mgr.playerView.Rotate(0);
         }
 
         public override void OnFixedUpdate()
