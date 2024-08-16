@@ -9,6 +9,11 @@ public class ResetController : MonoBehaviour,Iinteractive
     public UnityEvent OnReset;
     public GameObject[] trashes;
     public bool isable = true;
+    private bool isdone;
+    public void Done()
+    {
+        isdone = true;
+    }
     public void Enable()
     {
         isable = true;
@@ -19,7 +24,7 @@ public class ResetController : MonoBehaviour,Iinteractive
     }
     private void Start()
     {
-         text = (UIManager.Instance.GetUI(UIManager.TextUIName) as TextUI).Show("÷ÿ÷√∆˜", transform, 0.5f * Vector3.down);
+        text = (UIManager.Instance.GetUI(UIManager.TextUIName) as TextUI).Show("÷ÿ÷√∆˜", transform, 0.5f * Vector3.down);
 
         text.DisShow();
     }
@@ -41,6 +46,8 @@ public class ResetController : MonoBehaviour,Iinteractive
     }
     public void OnPlayerEnterInteractive()
     {
+        if (isdone) return;
+
         text.ChangeText("÷ÿ÷√∆˜");
         if (!isable)
         {

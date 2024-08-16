@@ -9,7 +9,15 @@ public class EventTrigger : MonoBehaviour
     public UnityEvent action;
     public bool isOnce = true;
     private bool isDone;
-
+    private BoxCollider2D _collider2D;
+    [ExecuteInEditMode]
+    private void OnDrawGizmos()
+    {
+        if (_collider2D == null) _collider2D = GetComponent<BoxCollider2D>();
+        DebugTool.DrawCollider(_collider2D);
+        if(target!=null)
+        Debug.DrawLine(transform.position, target.transform.position, Color.green);
+    }
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (target == null) return;

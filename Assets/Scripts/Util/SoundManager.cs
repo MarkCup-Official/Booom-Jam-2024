@@ -55,7 +55,7 @@ public class SoundManager : BaseMonoManager<SoundManager>
     {
         if (!clipDic.ContainsKey(soundName))
         {
-            AudioClip clip = Resources.Load<AudioClip>(soundName);
+            AudioClip clip = Resources.Load<AudioClip>("Sounds/" + soundName);
             clipDic.Add(soundName, clip);
         }
         return clipDic[soundName];
