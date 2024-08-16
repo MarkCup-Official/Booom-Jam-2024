@@ -9,9 +9,11 @@ public class Cleaner : MonoBehaviour
     private bool isRayActive = true;
     private Rigidbody2D rb;
     public Transform StartPos;
+    private AudioSource audioSource;
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
+        audioSource = GetComponent<AudioSource>();
     }
     private void Update()
     {
@@ -47,6 +49,9 @@ public class Cleaner : MonoBehaviour
                     hit.collider.gameObject.SetActive(false); 
                     isRayActive = false;
                     rb.isKinematic = true;
+                    audioSource.PlayOneShot(SoundManager.Instance.GetClip("piaji"));
+                    
+                    trash.OnClean();
                     transform.DOMove(hit.collider.transform.position, time - 0.1f);
                     if (trash.DestroyTheCleaner == true)
                     {

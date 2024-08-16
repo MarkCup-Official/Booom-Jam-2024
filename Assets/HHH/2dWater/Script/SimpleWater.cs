@@ -156,6 +156,7 @@ public class SimpleWater : MonoBehaviour
             mgr.moveController.PoolTouchedCount += 1;
             GeneratePop(mgr.transform.position + Vector3.down);
             templeMgr = mgr;
+            SoundManager.Instance.PlaySoundWithInterval("water","splash",0.3f,0.6f);
         }
     }
     private void OnTriggerExit2D(Collider2D collision)
@@ -163,6 +164,7 @@ public class SimpleWater : MonoBehaviour
         if (collision.CompareTag("Player"))
         {
             PlayerExit();
+          
         }
     }
     public void PlayerExit()
@@ -174,6 +176,9 @@ public class SimpleWater : MonoBehaviour
             templeMgr.moveController.PoolTouchedCount -= 1;
             GeneratePop(templeMgr.transform.position + Vector3.down);
             templeMgr = null;
+            SoundManager.Instance.PlaySoundWithInterval("water", "swim2", 0.3f, 0.6f);
+           
+            
         }
     }
     public void GeneratePop(Vector3 pos)

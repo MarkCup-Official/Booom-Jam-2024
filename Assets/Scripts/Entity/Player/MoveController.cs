@@ -31,7 +31,7 @@ public class MoveController : MonoBehaviour
 
     public Transform[] rayCheckPoints;
     public Transform[] rayCheckPointsWall;
-    public System.Action onLandAction;
+    public System.Action onLandAction { get; set; }
     private const int groundLayerMask = (1 << 7)|(1<<13);
 
     //×ßÂ·»Î¶¯
@@ -77,6 +77,7 @@ public class MoveController : MonoBehaviour
     /// </summary>
     public void OnLand()
     {
+        SoundManager.Instance.PlaySound($"Slime/small{Random.Range(1,6)}",0.5f);
         onLandAction?.Invoke();
     }
     public void HorizontalMove(float value)
@@ -209,6 +210,7 @@ public class MoveController : MonoBehaviour
             coyoteTimeTimer = 0f;
             rb.velocity = new Vector2(rb.velocity.x, JumpForce);
             springRb.velocity = new Vector2(springRb.velocity.x, 2 * JumpForce);
+            SoundManager.Instance.PlaySound($"Slime/jump{Random.Range(2, 4)}", 0.5f);
             jumpTimer = Time.time;
         }
     }
