@@ -35,7 +35,7 @@ public class PlayerDetector : MonoBehaviour
     }
     private void Update()
     {
-        if (target.Count>0)
+        if (target.Count==0)
         {
             return;
         }
