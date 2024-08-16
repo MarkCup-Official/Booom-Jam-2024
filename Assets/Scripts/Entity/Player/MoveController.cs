@@ -18,7 +18,10 @@ public class MoveController : MonoBehaviour
 
     private bool isGround;
     public bool isTouchWater { get { return WaterTouchedCount > 0; } }
+    public bool isInPool { get { return PoolTouchedCount > 0; } }
+    public bool isUnderRoof { get; set; }
     public int WaterTouchedCount { get; set; }
+    public int PoolTouchedCount { get; set; }
     public bool isWearingDivingSuit;
     public bool isTouchLadder { get; set; }
     public bool IsGround { get { return isGround; } }
@@ -157,7 +160,7 @@ public class MoveController : MonoBehaviour
             RaycastHit2D hit = Physics2D.Raycast(rayCheckPointsWall[i].position, Vector2.left, 0.8f, groundLayerMask);
             if (hit)
             {
-                return -Mathf.Abs(hit.point.x- transform.position.x);
+                return -Mathf.Abs(hit.point.x - transform.position.x);
             }
         }
         for (int i = 0; i < rayCheckPointsWall.Length; i++)
@@ -171,6 +174,20 @@ public class MoveController : MonoBehaviour
 
         return 0;
     }
+
+    public float CheckIsRoof()
+    {
+        for (int i = 0; i < rayCheckPointsWall.Length; i++)
+        {
+            RaycastHit2D hit = Physics2D.Raycast(rayCheckPointsWall[i].position, Vector2.up, 0.8f, groundLayerMask);
+            if (hit)
+            {
+                return Mathf.Abs(hit.point.y - transform.position.y);
+            }
+        }
+
+        return 10;
+    }
     /// <summary>
     /// handle jump logic
     /// </summary>
@@ -178,7 +195,7 @@ public class MoveController : MonoBehaviour
     public void JumpLogic(bool IsGetKeyDown)
     {
         if (!isUnderControl) return;
-        if (IsGetKeyDown && (coyoteTimeTimer > 0f || isGround || isTouchWater) && jumpTimer + jumpCD <= Time.time)
+        if (IsGetKeyDown && (coyoteTimeTimer > 0f || isGround || isInPool) && jumpTimer + jumpCD <= Time.time)
         {
             coyoteTimeTimer = 0f;
             rb.velocity = new Vector2(rb.velocity.x, JumpForce);

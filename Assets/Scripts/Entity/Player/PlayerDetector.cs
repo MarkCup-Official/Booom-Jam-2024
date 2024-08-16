@@ -5,7 +5,7 @@ using UnityEngine;
 public class PlayerDetector : MonoBehaviour
 {
   
-    public Iinteractive  target;
+    public List<Iinteractive>  target=new List<Iinteractive>();
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
@@ -14,7 +14,7 @@ public class PlayerDetector : MonoBehaviour
             Iinteractive obj;
             if (collision.gameObject.TryGetComponent<Iinteractive>(out obj))
             {
-                target = obj;
+                target.Add(obj);
                 obj.OnPlayerEnter(GetComponent<PlayerMgr>());
             }
         }
@@ -26,10 +26,8 @@ public class PlayerDetector : MonoBehaviour
             Iinteractive obj;
             if (collision.gameObject.TryGetComponent<Iinteractive>(out obj))
             {
-                if (obj == target)
-                {
-                    target = null;
-                }
+                
+                target.Remove(obj);
 
                 obj.OnPlayerExit();
             }
@@ -37,22 +35,25 @@ public class PlayerDetector : MonoBehaviour
     }
     private void Update()
     {
-        if (target == null)
+        if (target.Count>0)
         {
             return;
         }
 
         if (Input.GetKeyDown(KeyCode.F))
         {
-            target.OnPlayerEnterInteractive();
+            foreach(Iinteractive iinteractive in target)
+                iinteractive.OnPlayerEnterInteractive();
         }
         else if (Input.GetKey(KeyCode.F))
         {
-            target.OnPlayerInteractive();
+            foreach (Iinteractive iinteractive in target)
+                iinteractive.OnPlayerInteractive();
         }
         else if (Input.GetKeyUp(KeyCode.F))
         {
-            target.OnPlayerExitInteractive();
+            foreach (Iinteractive iinteractive in target)
+                iinteractive.OnPlayerExitInteractive();
         }
     }
 }

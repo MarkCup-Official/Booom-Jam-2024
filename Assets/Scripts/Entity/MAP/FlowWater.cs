@@ -17,6 +17,9 @@ public class FlowWater : MonoBehaviour
     private const int MaxCheckHeight = 100;
     private const int MaxCheckWidth = 50;
     private List<GameObject> spriteList = new List<GameObject>();
+
+    public float waterForce = 1;
+
     int layerMask = (1 << 7);
     public Vector3 Center { get { return transform.position + new Vector3(0.5f, 0.5f, 0f); } }
     private void Awake()
@@ -114,8 +117,8 @@ public class FlowWater : MonoBehaviour
             return;
         }
         Rigidbody2D rb = player.moveController.GetRigidBody();
-        rb.AddForce(new Vector2(0, -force));
-        rb.AddForce(1f * -rb.velocity);
+        rb.AddForce(new Vector2(0, -force*waterForce));
+        rb.AddForce(new Vector2(1f * -rb.velocity.x,0));
     }
     private void OnTriggerEnter2D(Collider2D collision)
     {
