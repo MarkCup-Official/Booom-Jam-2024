@@ -13,6 +13,7 @@ public class UIManager : BaseMonoManager<UIManager>
     public static string TextUIName = "Pannel/TextUI";
     public static string ChatUIName = "Pannel/ChatPannel";
     public static string SettingUI = "Pannel/SettingPannel";
+    public static string DeathUI = "Pannel/DeathPannel";
     protected override void Awake()
     {
         if (UIManager.Instance != null)
@@ -25,6 +26,7 @@ public class UIManager : BaseMonoManager<UIManager>
         ShowUI(TextUIName, PannelLayer.GameUI);
         InitUI(ChatUIName, PannelLayer.GameUI);
         InitUI(SettingUI, PannelLayer.MenuUI);
+        InitUI(DeathUI, PannelLayer.MenuUI);
 
     }
     private void Update()

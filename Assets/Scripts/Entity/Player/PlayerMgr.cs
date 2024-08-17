@@ -16,6 +16,7 @@ public class PlayerMgr : MonoBehaviour
     public string AnimationName = "Idle";
 
     public Box battery;
+    public Transform respawnPos;
 
     private void Awake()
     {
@@ -35,6 +36,7 @@ public class PlayerMgr : MonoBehaviour
         fsm.InitDefaultState(0);
 
     }
+    
     private void Update()
     {
         fsm.Update();
@@ -43,6 +45,21 @@ public class PlayerMgr : MonoBehaviour
     private void Start()
     {
         RemoveBattery();
+    }
+    public void SetRespawnPos(Transform transform)
+    {
+        respawnPos = transform;
+    }
+    public void Kill()
+    {
+        if (respawnPos == null) return;
+        GameObject deathParticle = ObjectPool.Instance.GetObject(playerView.killParticle);
+        deathParticle.transform.position = transform.position;
+        transform.position = respawnPos.position;
+        playerView.SetSpringCenterBackToOriginPos();
+        UIManager.Instance.GetUI(UIManager.DeathUI).OnShowUp();
+       
+
     }
     public void EquipBattery(Box battery)
     {

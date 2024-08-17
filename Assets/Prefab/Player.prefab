@@ -348,7 +348,7 @@ SpringJoint2D:
   m_Anchor: {x: 0, y: 0}
   m_ConnectedAnchor: {x: 0, y: 0}
   m_AutoConfigureDistance: 1
-  m_Distance: 1
+  m_Distance: 1.0000002
   m_DampingRatio: 0
   m_Frequency: 2
 --- !u!231 &6792258492861600135
@@ -545,6 +545,7 @@ GameObject:
   - component: {fileID: 7913573296612191254}
   - component: {fileID: 3634223739637893887}
   - component: {fileID: 1020790016280214375}
+  - component: {fileID: 1107413249587604074}
   m_Layer: 3
   m_Name: Player
   m_TagString: Player
@@ -639,6 +640,7 @@ MonoBehaviour:
   jumpForce: 0
   AnimationName: Idle
   battery: {fileID: 0}
+  respawnPos: {fileID: 0}
 --- !u!114 &7913573296612191254
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -660,6 +662,8 @@ MonoBehaviour:
   SpringAddHeight: 0.5
   springRb: {fileID: 75072653812114559}
   blueLight: {fileID: 4857148485580106600}
+  rotatrSprite: {fileID: 1752007156839037446}
+  killParticle: {fileID: 5041901561809933545, guid: 74798fe5fe14d664aa4d1e58822d923f, type: 3}
   characterSprites:
   - {fileID: -1652422023, guid: d4217501430a7024dbcc26fe4faa264b, type: 3}
   - {fileID: 990240666, guid: d4217501430a7024dbcc26fe4faa264b, type: 3}
@@ -710,6 +714,27 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1fa5b369be2b7044c898769304db04e4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!95 &1107413249587604074
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2858884141925533258}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 0}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &3842071431132989793
 GameObject:
   m_ObjectHideFlags: 0
@@ -942,13 +967,14 @@ GameObject:
   m_Component:
   - component: {fileID: 4242186395676040273}
   - component: {fileID: 206686363750774911}
+  - component: {fileID: 7805056088936808896}
   m_Layer: 3
   m_Name: BlueLight
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &4242186395676040273
 Transform:
   m_ObjectHideFlags: 0
@@ -981,7 +1007,7 @@ MonoBehaviour:
   m_BlendStyleIndex: 0
   m_FalloffIntensity: 0.5
   m_Color: {r: 0, g: 1, b: 0.98946476, a: 1}
-  m_Intensity: 1
+  m_Intensity: 3
   m_LightVolumeIntensity: 1
   m_LightVolumeIntensityEnabled: 0
   m_ApplyToSortingLayers: 00000000ed357f5a3bef7c5c6f4e293143dd1f866795332b
@@ -1002,8 +1028,8 @@ MonoBehaviour:
     m_Extent: {x: 0.9985302, y: 0.99853027, z: 0}
   m_PointLightInnerAngle: 360
   m_PointLightOuterAngle: 360
-  m_PointLightInnerRadius: 0
-  m_PointLightOuterRadius: 1
+  m_PointLightInnerRadius: 0.4
+  m_PointLightOuterRadius: 1.65
   m_ShapeLightParametricSides: 5
   m_ShapeLightParametricAngleOffset: 0
   m_ShapeLightParametricRadius: 1
@@ -1014,6 +1040,21 @@ MonoBehaviour:
   - {x: 0.5, y: -0.5, z: 0}
   - {x: 0.5, y: 0.5, z: 0}
   - {x: -0.5, y: 0.5, z: 0}
+--- !u!114 &7805056088936808896
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4857148485580106600}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 05ecbf1145130a4498b0eb2a86a533d1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Frequency: 1
+  startColor: {r: 0, g: 1, b: 0.9882353, a: 1}
+  endColor: {r: 0.21941781, g: 1, b: 0, a: 1}
 --- !u!1 &5010660026262544039
 GameObject:
   m_ObjectHideFlags: 0

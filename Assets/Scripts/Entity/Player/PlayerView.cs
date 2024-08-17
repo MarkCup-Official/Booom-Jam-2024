@@ -18,6 +18,7 @@ public class PlayerView : MonoBehaviour
     public Rigidbody2D springRb;
     public GameObject blueLight;
     public GameObject rotatrSprite;
+    public GameObject killParticle;
 
     public Sprite[] characterSprites;
 
