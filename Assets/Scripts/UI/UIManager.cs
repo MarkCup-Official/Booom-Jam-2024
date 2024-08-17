@@ -11,6 +11,8 @@ using GameFramework.UI;
 public class UIManager : BaseMonoManager<UIManager>
 {
     public static string TextUIName = "Pannel/TextUI";
+    public static string ChatUIName = "Pannel/ChatPannel";
+    public static string SettingUI = "Pannel/SettingPannel";
     protected override void Awake()
     {
         if (UIManager.Instance != null)
@@ -21,8 +23,18 @@ public class UIManager : BaseMonoManager<UIManager>
         base.Awake();
        
         ShowUI(TextUIName, PannelLayer.GameUI);
+        InitUI(ChatUIName, PannelLayer.GameUI);
+        InitUI(SettingUI, PannelLayer.MenuUI);
+
     }
-   
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            ShowUI(SettingUI);
+        }
+    }
+
     //已经生成的UI列表
 
     private Dictionary<string, BasePannel> UIPannelsDic = new Dictionary<string, BasePannel>();

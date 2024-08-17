@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Events;
+using UnityEngine.SceneManagement;
 public class MainTitle : MonoBehaviour
 {
 
@@ -22,6 +23,22 @@ public class MainTitle : MonoBehaviour
             }
         }
 
+    }
+    public void StartGame()
+    {
+        AsyncOperation load =  SceneManager.LoadSceneAsync("01");
+        load.completed += (AsyncOperation complete) =>
+        {
+
+        };
+    }
+    public void OpenSetting()
+    {
+
+    }
+    public void QuitGame()
+    {
+        Application.Quit();
     }
     
 }

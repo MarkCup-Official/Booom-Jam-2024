@@ -1,12 +1,16 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using GameFramework.UI;
 public class PlayerDetector : MonoBehaviour
 {
   
     public List<Iinteractive>  target=new List<Iinteractive>();
-
+    private KeyPannel pannel;
+    private void Start()
+    {
+        pannel = UIManager.Instance.ShowUI("Pannel/KeyPannel", PannelLayer.InfoUI) as KeyPannel;
+    }
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.CompareTag("Interactivable"))
@@ -16,6 +20,7 @@ public class PlayerDetector : MonoBehaviour
             {
                 target.Add(obj);
                 obj.OnPlayerEnter(GetComponent<PlayerMgr>());
+                pannel.Show(collision.transform, Vector3.up);
             }
         }
     }
@@ -30,6 +35,7 @@ public class PlayerDetector : MonoBehaviour
                 target.Remove(obj);
 
                 obj.OnPlayerExit();
+                pannel.DisShow();
             }
         }
     }

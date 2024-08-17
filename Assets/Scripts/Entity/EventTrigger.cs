@@ -18,6 +18,11 @@ public class EventTrigger : MonoBehaviour
         if(target!=null)
         Debug.DrawLine(transform.position, target.transform.position, Color.green);
     }
+    private void Awake()
+    {
+        _collider2D = GetComponent<BoxCollider2D>();
+        _collider2D.isTrigger = true;
+    }
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (target == null) return;

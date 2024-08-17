@@ -19,7 +19,7 @@ public class SimpleWater : MonoBehaviour
     public bool InitView = true;
     BoxCollider2D waterCollider;
     public bool IsHoldNeeded = true;
-    private bool isActive;
+    private bool isActive = true;
     private float ActiveTimer;
     private PlayerMgr templeMgr;
     private const float BuoyancyForce = 50;
@@ -79,7 +79,7 @@ public class SimpleWater : MonoBehaviour
             }
         }
         PopGenerateTimer = Time.time;
-
+       
     }
 
     // Update is called once per frame
@@ -91,10 +91,12 @@ public class SimpleWater : MonoBehaviour
         if (ActiveTimer + 0.1f < Time.time)
         {
             Disappear();
+           
         }
         else
         {
             Appear();
+            
         }
     }
     public void Disappear()

@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Events;
 public class TextPrinter : MonoBehaviour
 {
     public AudioClip printClip;
@@ -15,14 +16,28 @@ public class TextPrinter : MonoBehaviour
     private Text text;
     private bool isInGame;
     private int CurIndex;
-    private void Start()
+    private bool isPrint;
+    public UnityEvent OnPrintOver;
+    private void Awake()
     {
+        Init();
+    }
+    public void Init()
+    {
+        if (isInGame) return;
+
         isInGame = true;
         text = gameObject.GetComponent<Text>();
-
-
     }
+    public bool Set(List<string> content)
+    {
+        if (isPrint) return false;
 
+        CurIndex = 0;
+        this.content = content;
+        return true;
+    }
+    [ContextMenu("StartPrint")]
     public void StartPrint()
     {
         if (!isInGame) return;
@@ -33,15 +48,17 @@ public class TextPrinter : MonoBehaviour
     public IEnumerator PrintCourtine()
     {
         text.text = "";
+        isPrint = true;
         while (CurIndex < content.Count)
         {
-            for (int i = 0; i < content[CurIndex].Length; i++)
+
+            for (int i = 0; i <= content[CurIndex].Length; i++)
             {
                 text.text = content[CurIndex].Substring(0, i).Trim();
                 current++;
                 if (SoundManager.Instance && current >= printCycle)
                 {
-                    SoundManager.Instance.PlaySound(printClip,volume);
+                    SoundManager.Instance.PlaySound(printClip, volume);
                     current = 0;
                 }
 
@@ -51,7 +68,8 @@ public class TextPrinter : MonoBehaviour
             yield return new WaitForSeconds(breakInterval);
             CurIndex++;
         }
-
+        isPrint = false;
+        OnPrintOver?.Invoke();
     }
 
 }
