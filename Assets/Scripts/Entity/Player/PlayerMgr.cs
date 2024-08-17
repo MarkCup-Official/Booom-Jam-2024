@@ -190,15 +190,17 @@ namespace GameFramework.FSM.Player
             childFSM.AddState<State_IDLE>(0);
             childFSM.AddState<State_ClimbLadder>(1);
             childFSM.AddState<State_Swim>(2);
+            childFSM.AddState<State_Swim_Force>(3);
             childFSM.AddTrisition(0, () => mgr.moveController.isTouchLadder && InputMgr.GetVertical() != 0f, 1);
             childFSM.AddTrisition(0, () => mgr.moveController.isTouchWater, 2);
             childFSM.AddTrisition(2, () => !mgr.moveController.isTouchWater, 0);
+            childFSM.AddTrisition(2, () => mgr.moveController.isInPool, 3);
+            childFSM.AddTrisition(3, () => !mgr.moveController.isTouchWater, 0);
+            childFSM.AddTrisition(3, () => !mgr.moveController.isInPool, 2);
             childFSM.AddTrisition(1, () =>
             {
                 return (!mgr.moveController.isTouchLadder || InputMgr.GetSpaceDown());
             }, 0);
-
-
 
             childFSM.InitDefaultState(0);
         }
@@ -210,7 +212,7 @@ namespace GameFramework.FSM.Player
         }
         public override void OnExit()
         {
-
+            mgr.moveController.GetRigidBody().drag = 0;
         }
         public override void OnUpdate()
         {
@@ -221,7 +223,7 @@ namespace GameFramework.FSM.Player
         public override void OnFixedUpdate()
         {
             childFSM.FixedUpdate();
-            mgr.moveController.HorizontalMove(InputMgr.GetHorizontal());
+            //mgr.moveController.HorizontalMove(InputMgr.GetHorizontal());
 
         }
         public override void EquipBattery(Box battery)
@@ -827,7 +829,7 @@ namespace GameFramework.FSM.Player
 
         public override void OnEnter()
         {
-
+            mgr.moveController.GetRigidBody().drag = 6;
         }
         public override void OnUpdate()
         {
@@ -838,12 +840,55 @@ namespace GameFramework.FSM.Player
         }
         public override void OnExit()
         {
-
+            mgr.moveController.GetRigidBody().drag = 0;
         }
         public override void OnFixedUpdate()
         {
             base.OnFixedUpdate();
             mgr.moveController.VerticalMove(3 * InputMgr.GetVertical());
+            mgr.moveController.HorizontalMove(InputMgr.GetHorizontal());
+        }
+
+
+    }
+    public class State_Swim_Force : BaseState
+    {
+        public PlayerMgr mgr;
+        public State_Swim_Force(FSM owner) : base(owner)
+        {
+            mgr = owner.GetValue<PlayerMgr>("mgr");
+        }
+
+        public override void OnEnter()
+        {
+            mgr.moveController.GetRigidBody().drag = 6;
+        }
+        public override void OnUpdate()
+        {
+            base.OnUpdate();
+
+            mgr.playerView.Flip(InputMgr.GetHorizontal());
+
+        }
+        public override void OnExit()
+        {
+            mgr.moveController.GetRigidBody().drag = 0;
+        }
+        public override void OnFixedUpdate()
+        {
+            base.OnFixedUpdate();
+            //mgr.moveController.VerticalMove(3 * InputMgr.GetVertical());
+            //mgr.moveController.HorizontalMove(InputMgr.GetHorizontal());
+
+            if (InputMgr.GetVertical() > 0)
+            {
+                mgr.moveController.AddForce(new Vector2(InputMgr.GetHorizontal() * 0.15f, InputMgr.GetVertical() * 0.2f));
+            }
+            else
+            {
+                mgr.moveController.AddForce(new Vector2(InputMgr.GetHorizontal() * 0.15f, InputMgr.GetVertical() * 0.2f));
+            }
+
         }
 
 

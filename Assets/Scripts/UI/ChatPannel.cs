@@ -10,7 +10,6 @@ public class ChatPannel : BasePannel
     
     public void Show(List<string> list)
     {
-
         chatWindow.gameObject.SetActive(true);
         _animator.Play("Enter");
         if (printer.Set(list))
@@ -25,7 +24,6 @@ public class ChatPannel : BasePannel
     }
     public void Close()
     {
-        TimeDelay.Instance.Delay(1,()=> chatWindow.gameObject.SetActive(false));
         _animator.Play("Exit");
     }
 

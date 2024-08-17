@@ -31,7 +31,11 @@ public class TextPrinter : MonoBehaviour
     }
     public bool Set(List<string> content)
     {
-        if (isPrint) return false;
+        if (isPrint)
+        {
+            this.content.AddRange(content);
+            return false;
+        }
 
         CurIndex = 0;
         this.content = content;

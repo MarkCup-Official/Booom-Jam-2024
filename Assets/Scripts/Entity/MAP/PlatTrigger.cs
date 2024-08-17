@@ -88,8 +88,8 @@ public class PlatTrigger : MonoBehaviour, Iinteractive
         if (playerMgr == null) return;
 
         float distance = InputMgr.GetHorizontal();
-        if (distance > 0f) state = 1;
-        else if (distance < 0f) state = -1;
+        if (distance > 0.5f) state = 1;
+        else if (distance < -0.5f) state = -1;
         else state = 0;
     }
 }

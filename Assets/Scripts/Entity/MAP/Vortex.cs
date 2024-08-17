@@ -7,9 +7,9 @@ public class Vortex : MonoBehaviour
 
     public enum Direction
     {
-        none,
-        clockwise,
-        anticlockwise,
+        none=0,
+        clockwise=1,
+        anticlockwise=2,
     }
     public Direction direction;
     public SelfRotate particleRotate;
@@ -18,9 +18,16 @@ public class Vortex : MonoBehaviour
     public float VerticalVelocity = 10;
     public Dictionary<Collider2D, Rigidbody2D> allEnteredObjects = new();
 
-    private void Start()
+    public void SetDirection(int direction)
     {
-
+        this.direction = (Direction)direction;
+    }
+    public void Switch(int id)
+    {
+        if (direction != Direction.none)
+        {
+            direction = (Direction)id;
+        }
     }
     private void FixedUpdate()
     {
@@ -38,7 +45,7 @@ public class Vortex : MonoBehaviour
             {
                 Vector2 tangent = new Vector2(dir.y, -dir.x) * speed;
                 item.Value.AddForce(tangent);
-                item.Value.AddForce(-dir * VerticalVelocity);
+                //item.Value.AddForce(-dir * VerticalVelocity);
                 fanRotate.rotateDir =particleRotate.rotateDir = new Vector3(0, 0, -speed * 3);
                 Debug.DrawRay(item.Value.transform.position, tangent);
             }
@@ -46,7 +53,7 @@ public class Vortex : MonoBehaviour
             {
                 Vector2 tangent = new Vector2(-dir.y, dir.x) * speed;
                 item.Value.AddForce(tangent);
-                item.Value.AddForce(-dir * VerticalVelocity);
+                //item.Value.AddForce(-dir * VerticalVelocity);
                 fanRotate.rotateDir = particleRotate.rotateDir = new Vector3(0, 0, speed * 3);
                 Debug.DrawRay(item.Value.transform.position, tangent);
             }

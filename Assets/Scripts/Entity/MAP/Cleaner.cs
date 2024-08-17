@@ -39,7 +39,7 @@ public class Cleaner : MonoBehaviour
             return;
 
         const float time = 0.3f;
-        RaycastHit2D hit = Physics2D.Raycast(transform.position,dir, 1.4f, 1 << 7 | 1<<13);
+        RaycastHit2D hit = Physics2D.Raycast(transform.position,dir, 1.4f, 1 << 7 |1<<14);
         if (hit)
             if (hit.collider.CompareTag("Trash"))
             {
