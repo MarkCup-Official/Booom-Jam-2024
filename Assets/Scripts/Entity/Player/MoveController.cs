@@ -1,5 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class MoveController : MonoBehaviour
@@ -15,6 +17,9 @@ public class MoveController : MonoBehaviour
     public Rigidbody2D springRb;
     private Collider2D _collider;
     private bool isUnderControl = true;
+    private PlayerMgr playerMgr;
+
+    public List<float> WaterInDistance = new List<float>();
 
     private bool isGround;
     public bool isTouchWater { get { return WaterTouchedCount > 0; } }
@@ -51,6 +56,7 @@ public class MoveController : MonoBehaviour
         _collider = GetComponent<Collider2D>();
         normalPhysicMat2D = Resources.Load<PhysicsMaterial2D>("Config/NormalMat");
         smoothPhysicMat2D = Resources.Load<PhysicsMaterial2D>("Config/SmoothMat");
+        playerMgr = GetComponent<PlayerMgr>();
     }
     private void Start()
     {
@@ -71,6 +77,20 @@ public class MoveController : MonoBehaviour
         rb.AddForce(-rb.velocity * airResistanceCoefficient);
         if(IsGround && GetHorizontalSpeed()!=0f)
         springRb.AddForce(WalkShakeStrength * Vector2.up * Mathf.Sin(Time.time * WalkShakeFrequency));
+
+        //水的浮力
+        if (WaterInDistance.Count > 0)
+        {
+            float distance = WaterInDistance.Max();
+            distance = Mathf.Clamp(distance, 0, 1);
+            if (playerMgr.battery == null)
+                rb.AddForce(new Vector2(0, SimpleWater.BuoyancyForce * distance));
+            if (playerMgr.battery == null|| rb.velocity.y<0)
+            {
+                rb.AddForce(-SimpleWater.WaterResistance * rb.velocity);
+            }
+            WaterInDistance.Clear();
+        }
     }
     /// <summary>
     /// 落地的瞬间触发
@@ -205,7 +225,7 @@ public class MoveController : MonoBehaviour
     public void JumpLogic(bool IsGetKeyDown)
     {
         if (!isUnderControl) return;
-        if (IsGetKeyDown && (coyoteTimeTimer > 0f || isGround || isInPool) && jumpTimer + jumpCD <= Time.time)
+        if (IsGetKeyDown && (coyoteTimeTimer > 0f || isGround || (isInPool&&playerMgr.battery==null)) && jumpTimer + jumpCD <= Time.time)
         {
             coyoteTimeTimer = 0f;
             rb.velocity = new Vector2(rb.velocity.x, JumpForce);

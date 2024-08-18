@@ -22,8 +22,8 @@ public class SimpleWater : MonoBehaviour
     private bool isActive = true;
     private float ActiveTimer;
     private PlayerMgr templeMgr;
-    private const float BuoyancyForce = 50;
-    private const float WaterResistance = 2f;
+    public const float BuoyancyForce = 50;
+    public const float WaterResistance = 2f;
     [ExecuteInEditMode]
     private void OnDrawGizmos()
     {
@@ -140,10 +140,7 @@ public class SimpleWater : MonoBehaviour
 
             float distance = transform.position.y - templeMgr.transform.position.y + 1;
             distance = Mathf.Clamp(distance, 0, 1);
-            Rigidbody2D rb = templeMgr.moveController.GetRigidBody();
-            if (templeMgr.battery == null)
-                rb.AddForce(new Vector2(0, BuoyancyForce * distance));
-            rb.AddForce(-WaterResistance * rb.velocity);
+            templeMgr.moveController.WaterInDistance.Add(distance);
         }
     }
 

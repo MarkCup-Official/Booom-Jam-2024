@@ -39,34 +39,35 @@ public class Cleaner : MonoBehaviour
             return;
 
         const float time = 0.3f;
-        RaycastHit2D hit = Physics2D.Raycast(transform.position,dir, 1.4f, 1 << 7 |1<<14);
-        if (hit)
-            if (hit.collider.CompareTag("Trash"))
-            {
-                if (hit.collider.TryGetComponent(out Trash trash))
+        RaycastHit2D[] hits = Physics2D.RaycastAll(transform.position,dir, 1.4f, 1 << 7 |1<<14);
+        if (hits.Length>0)
+            foreach(var hit in hits)
+                if (hit.collider.CompareTag("Trash"))
                 {
-                    rb.velocity = Vector2.zero;
-                    hit.collider.gameObject.SetActive(false); 
-                    isRayActive = false;
-                    rb.isKinematic = true;
-                    audioSource.PlayOneShot(SoundManager.Instance.GetClip("piaji"));
-                    
-                    trash.OnClean();
-                    transform.DOMove(hit.collider.transform.position, time - 0.1f);
-                    if (trash.DestroyTheCleaner == true)
+                    if (hit.collider.TryGetComponent(out Trash trash))
                     {
-                        gameObject.SetActive(false);
-                        return;
+                        rb.velocity = Vector2.zero;
+                        hit.collider.gameObject.SetActive(false);
+                        isRayActive = false;
+                        rb.isKinematic = true;
+                        audioSource.PlayOneShot(SoundManager.Instance.GetClip("piaji"));
+
+                        trash.OnClean();
+                        transform.DOMove(hit.collider.transform.position, time - 0.1f);
+                        if (trash.DestroyTheCleaner == true)
+                        {
+                            gameObject.SetActive(false);
+                            return;
+                        }
+
+
+                        TimeDelay.Instance.Delay(time, () =>
+                        {
+                            isRayActive = true;
+                            rb.isKinematic = false;
+                        });
                     }
 
-                   
-                    TimeDelay.Instance.Delay(time, () =>
-                    {
-                        isRayActive = true;
-                        rb.isKinematic = false;
-                    });
                 }
-
-            }
     }
 }

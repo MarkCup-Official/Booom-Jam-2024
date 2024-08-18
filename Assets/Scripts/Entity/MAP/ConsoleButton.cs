@@ -10,6 +10,7 @@ public class ConsoleButton : MonoBehaviour,Iinteractive
     public bool isActive;
     private SingleText _text;
     public UnityEvent OnAble;
+    public UnityEvent OnAbleUpdate;
     public UnityEvent OnDisable;
     public UnityEvent OnSwitch;
     private void Start()
@@ -19,6 +20,13 @@ public class ConsoleButton : MonoBehaviour,Iinteractive
         _text.DisShow();
         Set(isActive,false);
     }
+
+    private void Update()
+    {
+        if (isActive)
+            OnAbleUpdate?.Invoke();
+    }
+
     public void Set(bool IsActive,bool playSound = true)
     {
         isActive = IsActive;
