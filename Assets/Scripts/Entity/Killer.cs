@@ -14,4 +14,13 @@ public class Killer : MonoBehaviour
             }
         }
     }
+
+    public void On()
+    {
+        transform.GetChild(0).GetComponent<SpriteRenderer>().color = new Color(0,0.63f,1);
+    }
+    public void Off()
+    {
+        transform.GetChild(0).GetComponent<SpriteRenderer>().color = Color.gray;
+    }
 }

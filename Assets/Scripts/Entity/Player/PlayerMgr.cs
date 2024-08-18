@@ -248,7 +248,7 @@ namespace GameFramework.FSM.Player
             if (mgr.battery == null)
             {
                 mgr.speed = 2.5f;
-                mgr.jumpForce = 6f;
+                mgr.jumpForce = 9f;//6
                 mgr.AnimationName = "Idle3";
 
             }
@@ -256,7 +256,7 @@ namespace GameFramework.FSM.Player
             {
                 mgr.AnimationName = "Idle4";
                 mgr.speed = 2;
-                mgr.jumpForce = 6f;
+                mgr.jumpForce = 9f;//6
             }
             mgr.UpdateState();
         }
