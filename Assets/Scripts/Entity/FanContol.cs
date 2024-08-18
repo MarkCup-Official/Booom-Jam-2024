@@ -7,6 +7,8 @@ public class FanContol : MonoBehaviour
     public GameObject[] selfRotateGo;
     public SelfRotate[] selfRotate;
 
+    public bool open = true;
+
     private void Start()
     {
         selfRotate = new SelfRotate[selfRotateGo.Length];
@@ -14,6 +16,15 @@ public class FanContol : MonoBehaviour
         for ( int i = 0; i < selfRotateGo.Length; i++ )
         {
             selfRotate[i] = selfRotateGo[i].transform.Find("object_23").GetComponent<SelfRotate>();
+        }
+
+        if (open)
+        {
+            Open();
+        }
+        else
+        {
+            Close();
         }
     }
 

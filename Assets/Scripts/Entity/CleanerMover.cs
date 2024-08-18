@@ -15,18 +15,22 @@ public class CleanerMover : MonoBehaviour
 
     public void Up()
     {
-        rb.AddForce ( Vector3.up * speed);
+        if (enabled)
+            rb.AddForce ( Vector3.up * speed);
     }
     public void Down()
     {
-        rb.AddForce(Vector3.down * speed);
+        if (enabled)
+            rb.AddForce(Vector3.down * speed);
     }
     public void Left()
     {
-        rb.AddForce(Vector3.left * speed);
+        if (enabled)
+            rb.AddForce(Vector3.left * speed);
     }
     public void Right()
     {
-        rb.AddForce(Vector3.right * speed);
+        if (enabled)
+            rb.AddForce(Vector3.right * speed);
     }
 }
