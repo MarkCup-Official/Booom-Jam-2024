@@ -36,7 +36,7 @@ public class BatteryBase : MonoBehaviour,Iinteractive
         if (battery != null)
         {
             // battery.UnLock();
-            battery.GetComponent<Rigidbody2D>().simulated = true;
+           
             if (!isBatteryAbleToMove)
             {
                 battery.transform.SetParent(null);
@@ -53,7 +53,7 @@ public class BatteryBase : MonoBehaviour,Iinteractive
             // battery.Lock();
            
             battery = playerMgr.RemoveBattery(); 
-            battery.GetComponent<Rigidbody2D>().simulated = false;
+            
             if (battery == null) return;
             if (!isBatteryAbleToMove)
             { battery.Lock();

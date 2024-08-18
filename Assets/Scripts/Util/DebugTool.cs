@@ -8,14 +8,18 @@ public static class DebugTool
     public static void DrawCollider(BoxCollider2D collider)
     {
 
+        DrawCollider(collider, Color.green);
+    }
+    public static void DrawCollider(BoxCollider2D collider,Color color)
+    {
+
         Vector2 center = (Vector2)collider.transform.position + collider.offset;
         Vector2 size = collider.size;
 
-        Vector2 topLeft = new Vector2(center.x - size.x/2f, center.y + size.y/2f);
+        Vector2 topLeft = new Vector2(center.x - size.x / 2f, center.y + size.y / 2f);
         Vector2 topRight = new Vector2(center.x + size.x / 2f, center.y + size.y / 2f);
         Vector2 bLeft = new Vector2(center.x - size.x / 2f, center.y - size.y / 2f);
         Vector2 bRight = new Vector2(center.x + size.x / 2f, center.y - size.y / 2f);
-        Color color = Color.green;
         Debug.DrawLine(topLeft, topRight, color);
         Debug.DrawLine(topRight, bRight, color);
         Debug.DrawLine(bRight, bLeft, color);

@@ -6,6 +6,14 @@ using UnityEngine;
 public class Wind : MonoBehaviour
 {
     //public
+    [ExecuteInEditMode]
+    private void OnDrawGizmos()
+    {
+        if (TryGetComponent(out BoxCollider2D _collider))
+        {
+            DebugTool.DrawCollider(_collider,Color.white);
+        }
+    }
     public enum Direction
     {
         Up=0, Down=1, Left=2, Right=3,

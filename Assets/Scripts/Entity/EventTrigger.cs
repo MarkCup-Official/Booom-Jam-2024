@@ -15,7 +15,7 @@ public class EventTrigger : MonoBehaviour
     {
         if (_collider2D == null) _collider2D = GetComponent<BoxCollider2D>();
         DebugTool.DrawCollider(_collider2D);
-        if(target!=null)
+        if(target!=null && !target.gameObject.CompareTag("Player"))
         Debug.DrawLine(transform.position, target.transform.position, Color.green);
     }
     private void Awake()

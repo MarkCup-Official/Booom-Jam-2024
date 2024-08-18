@@ -17,17 +17,21 @@ public class ConsoleButton : MonoBehaviour,Iinteractive
         _renderer = gameObject.GetComponent<SpriteRenderer>();
         _text = (UIManager.Instance.GetUI(UIManager.TextUIName) as TextUI).Show("¿ØÖÆÌ¨", transform, Vector3.down * 0.5f);
         _text.DisShow();
-        Set(isActive);
+        Set(isActive,false);
     }
-    public void Set(bool IsActive)
+    public void Set(bool IsActive,bool playSound = true)
     {
         isActive = IsActive;
         if (IsActive)
         {
+            if(playSound)
+            SoundManager.Instance.PlaySound("takeBattery",0.3f);
             _renderer.sprite = ActiveSprite;
         }
         else
         {
+            if (playSound)
+                SoundManager.Instance.PlaySound("putBattery", 0.3f);
             _renderer.sprite = DisactiveSprite;
         }
     }
