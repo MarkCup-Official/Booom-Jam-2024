@@ -31,8 +31,7 @@ public class PlayerMgr : MonoBehaviour
         fsm.SetValue("mgr", this);
         fsm.AddState<PlayerNormalState>(0);
         fsm.AddState<PlayerSwimState>(1);
-        fsm.AddTrisition(0, () => Input.GetKeyDown(KeyCode.T), 1);
-        fsm.AddTrisition(1, () => Input.GetKeyDown(KeyCode.T), 0);
+        
         fsm.InitDefaultState(0);
 
     }
