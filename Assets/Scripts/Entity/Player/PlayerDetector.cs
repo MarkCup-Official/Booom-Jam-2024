@@ -46,17 +46,17 @@ public class PlayerDetector : MonoBehaviour
             return;
         }
 
-        if (Input.GetKeyDown(KeyCode.F))
+        if (InputMgr.IsCatchButtonDown())
         {
             foreach(Iinteractive iinteractive in target)
                 iinteractive.OnPlayerEnterInteractive();
         }
-        else if (Input.GetKey(KeyCode.F))
+        else if (InputMgr.IsCatchButtonDown())
         {
             foreach (Iinteractive iinteractive in target)
                 iinteractive.OnPlayerInteractive();
         }
-        else if (Input.GetKeyUp(KeyCode.F))
+        else if (InputMgr.IsCatchButtonDown())
         {
             foreach (Iinteractive iinteractive in target)
                 iinteractive.OnPlayerExitInteractive();
