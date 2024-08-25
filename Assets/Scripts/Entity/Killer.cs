@@ -22,7 +22,7 @@ public class Killer : MonoBehaviour
 
     public void On()
     {
-        transform.GetChild(0).GetComponent<SpriteRenderer>().color = new Color(0,0.63f,1);
+        transform.GetChild(0).GetComponent<SpriteRenderer>().color = new Color(1, 0.3742138f, 0.3742138f);
         on = true;
     }
     public void Off()

@@ -39,6 +39,10 @@ public class PlayerMgr : MonoBehaviour
     private void Update()
     {
         fsm.Update();
+    }
+
+    private void FixedUpdate()
+    {
         fsm.FixedUpdate();
     }
     private void Start()
@@ -354,7 +358,7 @@ namespace GameFramework.FSM.Player
             {
                 if(0 < roof && roof <0.2f)
                 {
-                    isJump = 15;
+                    isJump = 6;
                 }
                 else
                 {
@@ -443,13 +447,6 @@ namespace GameFramework.FSM.Player
             }
 
         }
-        public override void OnFixedUpdate()
-        {
-            base.OnFixedUpdate();
-
-            mgr.moveController.AddForce(mgr.moveController.OnFanDirection * mgr.moveController.OnFanSpeed);
-        }
-
 
         public override void OnUpdate()
         {
@@ -466,8 +463,6 @@ namespace GameFramework.FSM.Player
             mgr = owner.GetValue<PlayerMgr>("mgr");
         }
 
-        int isJump = 0;
-
         public override void OnEnter()
         {
             base.OnEnter();
@@ -480,13 +475,6 @@ namespace GameFramework.FSM.Player
             base.OnFixedUpdate();
             //mgr.moveController.HorizontalMove(InputMgr.GetHorizontal());
 
-            mgr.moveController.AddForce(Vector2.up * 0.1f);
-
-            if (isJump > 0)
-            {
-                mgr.moveController.VerticalMove(-100);
-                isJump--;
-            }
 
         }
         public override void OnUpdate()
@@ -565,29 +553,12 @@ namespace GameFramework.FSM.Player
         {
             base.OnFixedUpdate();
 
-            if (mgr.moveController.OnFanSpeed < 0.1f)
-            {
-                mgr.moveController.AddForce(Vector2.up * InputMgr.GetVertical() * 0.1f * 0.7f);
-            }
-            else
-            {
-                mgr.moveController.AddForce(Vector2.up * InputMgr.GetVertical() * mgr.moveController.OnFanSpeed * 0.7f);
-            }
-            mgr.moveController.LimitVelocity(2);
-
-
-            mgr.moveController.AddForce(Vector2.left * 0.1f);
-
-            mgr.moveController.AddForce(mgr.moveController.OnFanDirection * mgr.moveController.OnFanSpeed * 0.5f);
-
             shake++;
             if (shake > 200)
             {
                 mgr.playerView.springRb.velocity = mgr.moveController.OnFanDirection * mgr.moveController.OnFanSpeed * 20;
                 shake = 0;
             }
-
-
         }
     }
     public class State_Normal_Fan_RightWall : BaseState
@@ -661,20 +632,6 @@ namespace GameFramework.FSM.Player
             base.OnFixedUpdate();
 
             
-            if (mgr.moveController.OnFanSpeed < 0.1f)
-            {
-                mgr.moveController.AddForce(Vector2.up * InputMgr.GetVertical() * 0.1f * 0.7f);
-            }
-            else
-            {
-                mgr.moveController.AddForce(Vector2.up * InputMgr.GetVertical() * mgr.moveController.OnFanSpeed * 0.7f);
-            }
-            mgr.moveController.LimitVelocity(2);
-
-
-            mgr.moveController.AddForce(Vector2.right * 0.1f);
-            mgr.moveController.AddForce(mgr.moveController.OnFanDirection * mgr.moveController.OnFanSpeed * 0.5f);
-
 
             shake++;
             if (shake > 200)
@@ -729,6 +686,7 @@ namespace GameFramework.FSM.Player
             base.OnEnter();
             mgr.moveController.DisableGravity();
             mgr.moveController.ChangePhysicMatSmooth(true);
+            mgr.moveController.fanBlow = true;
 
             if (mgr.battery == null)
             {
@@ -736,7 +694,7 @@ namespace GameFramework.FSM.Player
                 mgr.UpdateState();
             }
             childFSM.SwitchState(0);
-            isJump = 0;
+            mgr.moveController.isJump = 0;
 
             mgr.playerView.springRb.velocity = mgr.moveController.OnFanDirection * mgr.moveController.OnFanSpeed;
 
@@ -747,6 +705,7 @@ namespace GameFramework.FSM.Player
             mgr.moveController.EnableGravity();
             mgr.moveController.ChangePhysicMatSmooth(false);
             mgr.playerView.Rotate(0);
+            mgr.moveController.fanBlow = false;
 
 
             if (mgr.battery == null)
@@ -760,75 +719,54 @@ namespace GameFramework.FSM.Player
             mgr.UpdateState();
         }
 
-        int isJump = 0;
-        int isJumpV = 0;
 
         public override void OnUpdate()
         {
             base.OnUpdate();
 
-            isRoof = mgr.moveController.CheckIsRoof();
             childFSM.Update();
+
+
+            int currentState = childFSM.GetCurrentStateID();
+            mgr.moveController.fanState = childFSM.GetCurrentStateID();
+
+            if ((InputMgr.GetSpaceDown()) && Mathf.Abs(mgr.moveController.isWall) < 0.6f && isWall < -0.1f && currentState == 1)
+            {
+                mgr.moveController.isJump = 6;
+                mgr.playerView.springRb.velocity = Vector2.down * 25;
+            }
+            if ((InputMgr.GetSpaceDown()) && Mathf.Abs(mgr.moveController.isWall) < 0.6f && isWall > 0.1f && currentState == 2)
+            {
+                mgr.moveController.isJump = -6;
+                mgr.playerView.springRb.velocity = Vector2.down * 25;
+            }
+            if ((InputMgr.GetSpaceDown()) && Mathf.Abs(isRoof) < 0.2f && isRoof < 0 && currentState == 0)
+            {
+                mgr.moveController.isJumpV = 6;
+                mgr.playerView.springRb.velocity = Vector2.down * 25;
+            }
+            if ((InputMgr.GetSpaceDown()) && Mathf.Abs(isRoof) < 0.2f && isRoof > 0 && currentState == 3)
+            {
+                mgr.moveController.isJumpV = -6;
+                mgr.playerView.springRb.velocity = Vector2.down * 25;
+            }
         }
 
         public override void OnFixedUpdate()
         {
             base.OnFixedUpdate();
 
-            int currentState =childFSM.GetCurrentStateID();
-
             isWall = mgr.moveController.CheckIsWall();
-            mgr.moveController.isWall = mgr.moveController.CheckIsWall();
+            isRoof = mgr.moveController.CheckIsRoof();
+            mgr.moveController.isWall = isWall;
 
             childFSM.FixedUpdate();
 
-            if (isJump == 0 && (mgr.moveController.OnFanDirection != Vector3.left && mgr.moveController.OnFanDirection != Vector3.right))
+            if (mgr.moveController.isJump == 0 && (mgr.moveController.OnFanDirection != Vector3.left && mgr.moveController.OnFanDirection != Vector3.right))
                 mgr.moveController.HorizontalMove(InputMgr.GetHorizontal());
-            if (isJumpV == 0&&(mgr.moveController.OnFanDirection != Vector3.down&& mgr.moveController.OnFanDirection != Vector3.up))
+            if (mgr.moveController.isJumpV == 0&&(mgr.moveController.OnFanDirection != Vector3.down&& mgr.moveController.OnFanDirection != Vector3.up))
                 mgr.moveController.VerticalMove(InputMgr.GetVertical()*4);
 
-            if ((InputMgr.GetSpaceDown()) && Mathf.Abs(mgr.moveController.isWall) < 0.6f &&isWall<-0.1f&& currentState==1)
-            {
-                isJump = 12;
-                mgr.playerView.springRb.velocity = Vector2.down * 25;
-            }
-            if ((InputMgr.GetSpaceDown()) && Mathf.Abs(mgr.moveController.isWall) < 0.6f && isWall > 0.1f && currentState == 2)
-            {
-                isJump = -12;
-                mgr.playerView.springRb.velocity = Vector2.down  * 25;
-            }
-            if ((InputMgr.GetSpaceDown()) && Mathf.Abs(isRoof) < 0.2f && isRoof < 0 && currentState == 0)
-            {
-                isJumpV = 12;
-                mgr.playerView.springRb.velocity = Vector2.down * 25;
-            }
-            if ((InputMgr.GetSpaceDown()) && Mathf.Abs(isRoof) < 0.2f && isRoof > 0 && currentState == 3)
-            {
-                isJumpV = -12;
-                mgr.playerView.springRb.velocity = Vector2.down * 25;
-            }
-            if (isJump > 0)
-            {
-                mgr.moveController.HorizontalMove(100);
-                isJump--;
-            }
-            if (isJump < 0)
-            {
-                mgr.moveController.HorizontalMove(-100);
-                isJump++;
-            }
-            if (isJumpV > 0)
-            {
-                mgr.moveController.VerticalMove(100);
-                isJumpV--;
-            }
-            if (isJumpV < 0)
-            {
-                mgr.moveController.VerticalMove(-100);
-                isJumpV++;
-            }
-
-            mgr.moveController.LimitVelocity(10);
         }
 
 
@@ -897,11 +835,11 @@ namespace GameFramework.FSM.Player
 
             if (InputMgr.GetVertical() > 0)
             {
-                mgr.moveController.AddForce(new Vector2(InputMgr.GetHorizontal() * 0.15f, InputMgr.GetVertical() * 0.2f));
+                mgr.moveController.AddForce(new Vector2(InputMgr.GetHorizontal() * 0.15f*3, InputMgr.GetVertical() * 0.2f*3));
             }
             else
             {
-                mgr.moveController.AddForce(new Vector2(InputMgr.GetHorizontal() * 0.15f, InputMgr.GetVertical() * 0.2f));
+                mgr.moveController.AddForce(new Vector2(InputMgr.GetHorizontal() * 0.15f*3, InputMgr.GetVertical() * 0.2f* 3));
             }
 
         }
