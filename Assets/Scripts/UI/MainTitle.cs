@@ -26,7 +26,7 @@ public class MainTitle : MonoBehaviour
     }
     public void StartGame()
     {
-        AsyncOperation load =  SceneManager.LoadSceneAsync("01");
+        AsyncOperation load =  SceneManager.LoadSceneAsync(1);
         load.completed += (AsyncOperation complete) =>
         {
 
