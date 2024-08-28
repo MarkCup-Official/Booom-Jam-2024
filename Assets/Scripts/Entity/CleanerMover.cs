@@ -13,24 +13,41 @@ public class CleanerMover : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
     }
 
+    Vector3 direction = Vector3.zero;
+
+    private void FixedUpdate()
+    {
+        if(direction == Vector3.zero)
+        {
+            return;
+        }
+        rb.AddForce(direction * speed);
+        direction = Vector3.zero;
+    }
+
     public void Up()
     {
         if (enabled)
-            rb.AddForce ( Vector3.up * speed);
+            direction.y = 1;
+    }
+    public void Up2(int i)
+    {
+        if (enabled)
+            direction.y = i;
     }
     public void Down()
     {
         if (enabled)
-            rb.AddForce(Vector3.down * speed);
+            direction.y = -1;
     }
     public void Left()
     {
         if (enabled)
-            rb.AddForce(Vector3.left * speed);
+            direction.x = -1;
     }
     public void Right()
     {
         if (enabled)
-            rb.AddForce(Vector3.right * speed);
+            direction.x = 1;
     }
 }

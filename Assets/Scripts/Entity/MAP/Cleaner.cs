@@ -28,9 +28,13 @@ public class Cleaner : MonoBehaviour
     }
     public void ResetPos()
     {
+        gameObject.SetActive(true);
         if (StartPos == null) return;
 
         transform.position = StartPos.transform.position;
+
+        isRayActive = true;
+        rb.isKinematic = false;
 
     }
     public void CheckSingleDir(Vector2 dir)

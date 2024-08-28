@@ -50,6 +50,11 @@ public class MoveController : MonoBehaviour
     public float OnFanSpeed { get; set; }
     public float isWall { get; set; }
 
+    public bool fanBlow { get; set; } = false;
+    public int isJump = 0;
+    public int isJumpV = 0;
+    public int fanState = 0;
+
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -57,6 +62,7 @@ public class MoveController : MonoBehaviour
         normalPhysicMat2D = Resources.Load<PhysicsMaterial2D>("Config/NormalMat");
         smoothPhysicMat2D = Resources.Load<PhysicsMaterial2D>("Config/SmoothMat");
         playerMgr = GetComponent<PlayerMgr>();
+
     }
     private void Start()
     {
@@ -85,11 +91,80 @@ public class MoveController : MonoBehaviour
             distance = Mathf.Clamp(distance, 0, 1);
             if (playerMgr.battery == null)
                 rb.AddForce(new Vector2(0, SimpleWater.BuoyancyForce * distance));
-            if (playerMgr.battery == null|| rb.velocity.y<0)
+            if (playerMgr.battery == null || rb.velocity.y < 0)
             {
                 rb.AddForce(-SimpleWater.WaterResistance * rb.velocity);
             }
             WaterInDistance.Clear();
+        }
+        const float mut = 3;
+        //·çÉÈ
+        if (fanBlow)
+        {
+
+            if (fanState == 0)//air
+            {
+                AddForce(OnFanDirection * OnFanSpeed* mut);
+            }
+            else if (fanState == 1)//left
+            {
+                if (OnFanSpeed < 0.1f)
+                {
+                    AddForce(Vector2.up * InputMgr.GetVertical() * 0.1f * 0.7f * mut);
+                }
+                else
+                {
+                    AddForce(Vector2.up * InputMgr.GetVertical() * OnFanSpeed * 1f * mut);
+                }
+                LimitVelocity(2);
+
+                AddForce(Vector2.left * 0.1f);
+
+                AddForce(OnFanDirection * OnFanSpeed * 0.5f * mut);
+            }
+            else if (fanState == 2)//right
+            {
+                if (OnFanSpeed < 0.1f)
+                {
+                    AddForce(Vector2.up * InputMgr.GetVertical() * 0.1f * 0.7f * mut);
+                }
+                else
+                {
+                    AddForce(Vector2.up * InputMgr.GetVertical() * OnFanSpeed * 1f * mut);
+                }
+
+
+                LimitVelocity(2);
+                AddForce(Vector2.right * 0.1f);
+                AddForce(OnFanDirection * OnFanSpeed * 0.5f * mut);
+
+            }else if (fanState == 3)//roof
+            {
+                AddForce(Vector2.up * 0.1f);
+            }
+
+            if (isJump > 0)
+            {
+                HorizontalMove(100);
+                isJump--;
+            }
+            if (isJump < 0)
+            {
+                HorizontalMove(-100);
+                isJump++;
+            }
+            if (isJumpV > 0)
+            {
+                VerticalMove(100);
+                isJumpV--;
+            }
+            if (isJumpV < 0)
+            {
+                VerticalMove(-100);
+                isJumpV++;
+            }
+
+            LimitVelocity(10);
         }
     }
     /// <summary>
@@ -118,7 +193,7 @@ public class MoveController : MonoBehaviour
     {
         if (!isUnderControl) return;
         if (value == Vector2.zero) return;
-        rb.velocity += value;
+        rb.AddForce(value * 100);
     }
     public void LimitVelocity(float maxSpeed)
     {
